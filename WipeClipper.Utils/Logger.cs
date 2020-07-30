@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DiscordAndTwitch {
     public static class Logger {
-        public delegate void BotMessage(string message);
-        public static BotMessage Log;
+        public delegate void Message(string message);
+        public static Message Log;
 
         public static void Debug(string message) {
             Log?.Invoke($"[Debug] {message}");
