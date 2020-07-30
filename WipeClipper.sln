@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WipeClipper.Core", "WipeClipper.Core\WipeClipper.Core.csproj", "{E3016631-263F-41CD-9872-E068BE37B1C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WipeClipper.Utils", "WipeClipper.Utils\WipeClipper.Utils.csproj", "{168AF7F7-7236-41DA-8B25-F1BB0AEE7190}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3016631-263F-41CD-9872-E068BE37B1C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3016631-263F-41CD-9872-E068BE37B1C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3016631-263F-41CD-9872-E068BE37B1C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3016631-263F-41CD-9872-E068BE37B1C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{168AF7F7-7236-41DA-8B25-F1BB0AEE7190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{168AF7F7-7236-41DA-8B25-F1BB0AEE7190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{168AF7F7-7236-41DA-8B25-F1BB0AEE7190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{168AF7F7-7236-41DA-8B25-F1BB0AEE7190}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B218856E-2CDB-49A3-8D13-35CB24004B2C}
+	EndGlobalSection
+EndGlobal
