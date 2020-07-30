@@ -3,8 +3,9 @@ An ACT plugin for FF14 that takes Twitch clips of raid wipes and posts them on D
 
 ## Features
 - Automatic clipping of multiple Twitch streams on raid wipes.
-- Automatic posting of said clips to user-designated Discord channels, along with pull time and number.
+- Automatic posting of said clips to user-designated Discord channels, along with a pull time and pull number.
 - Summaries of a raid that include some statistics and a plot that can be sent to a Discord channel.
+- Add breaks to the plot that indicate where you took a break, in order to see how that impacts pull times.
 - Choose which zone the plugin takes clips in using Regex.
 - Manual stream clipping via FF14's chat (that anyone, be it from your party, FC or linkshells can use, so don't set it to common words) with a custom keyword using Regex.
 - Ability to differentiate between good / bad pulls based on pull time using a red / green message color.
