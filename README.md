@@ -10,7 +10,7 @@ An ACT plugin for FF14 that takes Twitch clips of raid wipes and posts them on D
 - Ability to differentiate between good / bad pulls based on pull time using a red / green message color.
 
 ## Download
-For the latest version please see [releases](https://github.com/Mor3x/Wipe-Clipper/releases).
+For the latest version please see [releases.](https://github.com/Mor3x/Wipe-Clipper/releases)
 
 ## Installation instructions
 After downloading the .dll, place it in the plugin folder of ACT. This is usually under %appdata%/Advanced Combat Tracker/Plugins.
@@ -18,7 +18,7 @@ It's now ready to run. Please note that ACT might prompt you to unblock the dll,
 
 
 ## Setup 
-For the setup guide please refer to [wiki.](https://github.com/Mor3x/Wipe-Clipper/releases).
+For the setup guide please refer to [wiki.](https://github.com/Mor3x/Wipe-Clipper/releases)
 
 ## Things to keep in mind
 - The plugin only considers a pull valid if it was started with a countdown, "Engage" being the start of the pull.
