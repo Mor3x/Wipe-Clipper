@@ -42,7 +42,10 @@ namespace WipeClipperPlugin {
 
         public void DeInitPlugin() {
             SaveSettings();
-            Discord.Disconnect();
+            if (_isStarted) {
+                Discord.Disconnect();
+            }
+
             MainLogic.Deinit();
             Settings.UserIDs.Clear();
             Settings.Channels.Clear();
