@@ -111,7 +111,7 @@ namespace DiscordAndTwitch {
 
         public static void Disconnect() {
             Logger.Debug("Disconnecting from Discord.");
-            Bot.DisconnectAsync().ConfigureAwait(false);
+            Bot?.DisconnectAsync().ConfigureAwait(false);
         }
     }
 }
