@@ -10,6 +10,11 @@ An ACT plugin for FF14 that takes Twitch clips of raid wipes and posts them on D
 - Manual stream clipping via FF14's chat (that anyone, be it from your party, FC or linkshells can use, so don't set it to common words) with a custom keyword using Regex.
 - Ability to differentiate between good / bad pulls based on pull time using a red / green message color.
 
+Examples:
+
+![](https://i.imgur.com/sFC7Jnm.png)
+![](https://i.imgur.com/0CUHhbo.png)
+
 ## Download
 For the latest version please see [releases.](https://github.com/Mor3x/Wipe-Clipper/releases)
 
@@ -28,4 +33,5 @@ For the setup guide please refer to [wiki.](https://github.com/Mor3x/Wipe-Clippe
 the pulls from the last session will still count towards the pull number and on the summary.
 
 ## Questions and feature suggestions
-If you have any questions, bug reports and/or feature requests, please submit them [here.](https://github.com/Mor3x/Wipe-Clipper/issues)
+If you have any questions, bug reports and/or feature requests, please submit them [here](https://github.com/Mor3x/Wipe-Clipper/issues),
+or message me on Discord - Morex#9341
