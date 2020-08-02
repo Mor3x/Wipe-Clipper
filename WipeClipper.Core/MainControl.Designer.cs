@@ -26,8 +26,15 @@ namespace WipeClipperPlugin {
         /// </summary>
         private void InitializeComponent() {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ManualClipKeywordTextBox = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.GetCurrentZoneButton = new System.Windows.Forms.Button();
+            this.GreenThresholdTextBox = new System.Windows.Forms.TextBox();
+            this.ZoneTextBox = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.SummariesChannelTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.ClipsChannelTextBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -43,8 +50,6 @@ namespace WipeClipperPlugin {
             this.message = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.PostSummaryButton = new System.Windows.Forms.Button();
             this.AddBreakButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.GreenThresholdTextBox = new System.Windows.Forms.TextBox();
             this.AutoStartCheckBox = new System.Windows.Forms.CheckBox();
             this.ChannelsListBox = new System.Windows.Forms.ListBox();
             this.ChannelTextBox = new System.Windows.Forms.TextBox();
@@ -52,11 +57,6 @@ namespace WipeClipperPlugin {
             this.RemoveChannelButton = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.StatusLabel = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.ZoneTextBox = new System.Windows.Forms.TextBox();
-            this.GetCurrentZoneButton = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
-            this.ManualClipKeywordTextBox = new System.Windows.Forms.TextBox();
             this.ResetPullsButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -87,6 +87,59 @@ namespace WipeClipperPlugin {
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
             // 
+            // ManualClipKeywordTextBox
+            // 
+            this.ManualClipKeywordTextBox.Location = new System.Drawing.Point(151, 148);
+            this.ManualClipKeywordTextBox.Name = "ManualClipKeywordTextBox";
+            this.ManualClipKeywordTextBox.Size = new System.Drawing.Size(164, 20);
+            this.ManualClipKeywordTextBox.TabIndex = 6;
+            this.ManualClipKeywordTextBox.Text = "!clip";
+            this.ManualClipKeywordTextBox.TextChanged += new System.EventHandler(this.ManualClipKeywordTextBox_TextChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(7, 151);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(102, 13);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "Clip keyword (regex)";
+            // 
+            // GetCurrentZoneButton
+            // 
+            this.GetCurrentZoneButton.Location = new System.Drawing.Point(213, 224);
+            this.GetCurrentZoneButton.Name = "GetCurrentZoneButton";
+            this.GetCurrentZoneButton.Size = new System.Drawing.Size(102, 22);
+            this.GetCurrentZoneButton.TabIndex = 9;
+            this.GetCurrentZoneButton.Text = "Get Current Zone";
+            this.GetCurrentZoneButton.UseVisualStyleBackColor = true;
+            this.GetCurrentZoneButton.Click += new System.EventHandler(this.GetCurrentZoneButton_Click);
+            // 
+            // GreenThresholdTextBox
+            // 
+            this.GreenThresholdTextBox.Location = new System.Drawing.Point(212, 174);
+            this.GreenThresholdTextBox.Name = "GreenThresholdTextBox";
+            this.GreenThresholdTextBox.Size = new System.Drawing.Size(103, 20);
+            this.GreenThresholdTextBox.TabIndex = 7;
+            this.GreenThresholdTextBox.TextChanged += new System.EventHandler(this.GreenThresholdTextBox_TextChanged);
+            // 
+            // ZoneTextBox
+            // 
+            this.ZoneTextBox.Location = new System.Drawing.Point(151, 200);
+            this.ZoneTextBox.Name = "ZoneTextBox";
+            this.ZoneTextBox.Size = new System.Drawing.Size(164, 20);
+            this.ZoneTextBox.TabIndex = 8;
+            this.ZoneTextBox.TextChanged += new System.EventHandler(this.ZoneTextBox_TextChanged);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 203);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(105, 13);
+            this.label9.TabIndex = 12;
+            this.label9.Text = "Allowed zone (regex)";
+            // 
             // label7
             // 
             this.label7.AutoSize = true;
@@ -103,6 +156,15 @@ namespace WipeClipperPlugin {
             this.SummariesChannelTextBox.Size = new System.Drawing.Size(164, 20);
             this.SummariesChannelTextBox.TabIndex = 5;
             this.SummariesChannelTextBox.TextChanged += new System.EventHandler(this.SummariesChannelTextBox_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 177);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(187, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Green message threshold (in seconds)";
             // 
             // label6
             // 
@@ -189,7 +251,7 @@ namespace WipeClipperPlugin {
             this.StartStopButton.Location = new System.Drawing.Point(783, 4);
             this.StartStopButton.Name = "StartStopButton";
             this.StartStopButton.Size = new System.Drawing.Size(100, 23);
-            this.StartStopButton.TabIndex = 15;
+            this.StartStopButton.TabIndex = 14;
             this.StartStopButton.Text = "Start";
             this.StartStopButton.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
             this.StartStopButton.UseVisualStyleBackColor = true;
@@ -210,7 +272,7 @@ namespace WipeClipperPlugin {
             this.LogList.Location = new System.Drawing.Point(14, 262);
             this.LogList.Name = "LogList";
             this.LogList.Size = new System.Drawing.Size(869, 251);
-            this.LogList.TabIndex = 14;
+            this.LogList.TabIndex = 18;
             this.LogList.UseCompatibleStateImageBehavior = false;
             this.LogList.View = System.Windows.Forms.View.Details;
             // 
@@ -229,7 +291,7 @@ namespace WipeClipperPlugin {
             this.PostSummaryButton.Location = new System.Drawing.Point(783, 62);
             this.PostSummaryButton.Name = "PostSummaryButton";
             this.PostSummaryButton.Size = new System.Drawing.Size(100, 23);
-            this.PostSummaryButton.TabIndex = 17;
+            this.PostSummaryButton.TabIndex = 16;
             this.PostSummaryButton.Text = "Post Summary";
             this.PostSummaryButton.UseVisualStyleBackColor = true;
             this.PostSummaryButton.Click += new System.EventHandler(this.PostSummaryButton_Click);
@@ -239,27 +301,10 @@ namespace WipeClipperPlugin {
             this.AddBreakButton.Location = new System.Drawing.Point(783, 33);
             this.AddBreakButton.Name = "AddBreakButton";
             this.AddBreakButton.Size = new System.Drawing.Size(100, 23);
-            this.AddBreakButton.TabIndex = 16;
+            this.AddBreakButton.TabIndex = 15;
             this.AddBreakButton.Text = "Add Break";
             this.AddBreakButton.UseVisualStyleBackColor = true;
             this.AddBreakButton.Click += new System.EventHandler(this.AddBreakButton_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 177);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(187, 13);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Green message threshold (in seconds)";
-            // 
-            // GreenThresholdTextBox
-            // 
-            this.GreenThresholdTextBox.Location = new System.Drawing.Point(212, 174);
-            this.GreenThresholdTextBox.Name = "GreenThresholdTextBox";
-            this.GreenThresholdTextBox.Size = new System.Drawing.Size(103, 20);
-            this.GreenThresholdTextBox.TabIndex = 9;
-            this.GreenThresholdTextBox.TextChanged += new System.EventHandler(this.GreenThresholdTextBox_TextChanged);
             // 
             // AutoStartCheckBox
             // 
@@ -326,57 +371,12 @@ namespace WipeClipperPlugin {
             this.StatusLabel.TabIndex = 20;
             this.StatusLabel.Text = "Stopped";
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 203);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(105, 13);
-            this.label9.TabIndex = 12;
-            this.label9.Text = "Allowed zone (regex)";
-            // 
-            // ZoneTextBox
-            // 
-            this.ZoneTextBox.Location = new System.Drawing.Point(151, 200);
-            this.ZoneTextBox.Name = "ZoneTextBox";
-            this.ZoneTextBox.Size = new System.Drawing.Size(164, 20);
-            this.ZoneTextBox.TabIndex = 6;
-            this.ZoneTextBox.TextChanged += new System.EventHandler(this.ZoneTextBox_TextChanged);
-            // 
-            // GetCurrentZoneButton
-            // 
-            this.GetCurrentZoneButton.Location = new System.Drawing.Point(213, 224);
-            this.GetCurrentZoneButton.Name = "GetCurrentZoneButton";
-            this.GetCurrentZoneButton.Size = new System.Drawing.Size(102, 22);
-            this.GetCurrentZoneButton.TabIndex = 7;
-            this.GetCurrentZoneButton.Text = "Get Current Zone";
-            this.GetCurrentZoneButton.UseVisualStyleBackColor = true;
-            this.GetCurrentZoneButton.Click += new System.EventHandler(this.GetCurrentZoneButton_Click);
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 151);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(102, 13);
-            this.label10.TabIndex = 15;
-            this.label10.Text = "Clip keyword (regex)";
-            // 
-            // ManualClipKeywordTextBox
-            // 
-            this.ManualClipKeywordTextBox.Location = new System.Drawing.Point(151, 148);
-            this.ManualClipKeywordTextBox.Name = "ManualClipKeywordTextBox";
-            this.ManualClipKeywordTextBox.Size = new System.Drawing.Size(164, 20);
-            this.ManualClipKeywordTextBox.TabIndex = 8;
-            this.ManualClipKeywordTextBox.Text = "!clip";
-            this.ManualClipKeywordTextBox.TextChanged += new System.EventHandler(this.ManualClipKeywordTextBox_TextChanged);
-            // 
             // ResetPullsButton
             // 
             this.ResetPullsButton.Location = new System.Drawing.Point(783, 91);
             this.ResetPullsButton.Name = "ResetPullsButton";
             this.ResetPullsButton.Size = new System.Drawing.Size(100, 23);
-            this.ResetPullsButton.TabIndex = 21;
+            this.ResetPullsButton.TabIndex = 17;
             this.ResetPullsButton.Text = "Reset Pulls";
             this.ResetPullsButton.UseVisualStyleBackColor = true;
             this.ResetPullsButton.Click += new System.EventHandler(this.ResetPullsButton_Click);

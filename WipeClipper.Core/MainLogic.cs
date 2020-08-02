@@ -166,14 +166,15 @@ namespace WipeClipperPlugin {
         public static void ChangeStatusLabel(bool working) {
             if (working) {
                 LabelChangedEventHandler handler = OnStatusLabelChanged;
-                handler?.Invoke(null, new StatusChangedEventArgs("Started", true));
+                handler?.Invoke(null, new StatusChangedEventArgs(true));
             } else {
                 LabelChangedEventHandler handler = OnStatusLabelChanged;
-                handler?.Invoke(null, new StatusChangedEventArgs("Stopped", false));
+                handler?.Invoke(null, new StatusChangedEventArgs(false));
             }
         }
 
         public static void Deinit() {
+            Stop();
             ActGlobals.oFormActMain.OnLogLineRead -= OnLogLineRead;
         }
 

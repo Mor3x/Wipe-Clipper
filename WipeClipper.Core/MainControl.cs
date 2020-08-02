@@ -29,7 +29,7 @@ namespace WipeClipperPlugin {
 
             xmlSettings = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
             LoadSettings();
-            
+
             Logger.Log += Log;
             MainLogic.OnStatusLabelChanged += HandleStatusChanged;
             Logger.Debug("Loaded.");
@@ -42,78 +42,9 @@ namespace WipeClipperPlugin {
 
         public void DeInitPlugin() {
             SaveSettings();
-            if (_isStarted) {
-                Discord.Disconnect();
-            }
-
             MainLogic.Deinit();
             Settings.UserIDs.Clear();
             Settings.Channels.Clear();
-        }
-
-        private void HandleStatusChanged(object sender, StatusChangedEventArgs e) {
-            StatusLabel.Text = e.Text;
-            _isStarted = e.Status;
-            if (_isStarted) {
-                StartStopButton.Text = "Stop";
-                StatusLabel.ForeColor = Color.Green;
-            } else {
-                MainLogic.Stop();
-                StartStopButton.Text = "Start";
-                StatusLabel.ForeColor = Color.Red;
-            }
-        }
-
-        private void ClientIdTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.ClientId = ClientIdTextBox.Text;
-        }
-
-        private void AccessTokenTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.AccessToken = AccessTokenTextBox.Text;
-        }
-
-        private void DiscordTokenTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.DiscordToken = DiscordTokenTextBox.Text;
-        }
-
-        private void ClipsChannelTextBox_TextChanged(object sender, EventArgs e) {
-            if (ulong.TryParse(ClipsChannelTextBox.Text.Trim(), out var result)) {
-                Settings.ClipsChannel = result;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
-            } else if (string.IsNullOrWhiteSpace(ClipsChannelTextBox.Text)) {
-                Settings.ClipsChannel = 0;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
-            }
-        }
-
-        private void SummariesChannelTextBox_TextChanged(object sender, EventArgs e) {
-            if (ulong.TryParse(SummariesChannelTextBox.Text.Trim(), out var result)) {
-                Settings.SummariesChannel = result;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
-            } else if (string.IsNullOrWhiteSpace(SummariesChannelTextBox.Text)) {
-                Settings.SummariesChannel = 0;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
-            }
-        }
-
-        private void StartStopButton_Click(object sender, EventArgs e) {
-            if (!_isStarted) {
-                Logger.Debug("Started");
-                MainLogic.Setup().ConfigureAwait(false);
-            } else {
-                MainLogic.Stop();
-            }
-        }
-
-        public void Log(string text) {
-            var row = new string[2];
-            row[0] = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString();
-            row[1] = text;
-            LogList.Items.Add(new ListViewItem(row)).EnsureVisible();
         }
 
         #region Settings
@@ -166,6 +97,71 @@ namespace WipeClipperPlugin {
             }
         }
         #endregion
+
+        public void Log(string text) {
+            var row = new string[2];
+            row[0] = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString();
+            row[1] = text;
+            LogList.Items.Add(new ListViewItem(row)).EnsureVisible();
+        }
+
+        private void HandleStatusChanged(object sender, StatusChangedEventArgs e) {
+            _isStarted = e.Status;
+            if (_isStarted) {
+                StartStopButton.Text = "Stop";
+                StatusLabel.ForeColor = Color.Green;
+                StatusLabel.Text = "Started";
+            } else {
+                StartStopButton.Text = "Start";
+                StatusLabel.ForeColor = Color.Red;
+                StatusLabel.Text = "Stopped";
+            }
+        }
+
+        private void ClientIdTextBox_TextChanged(object sender, EventArgs e) {
+            Settings.ClientId = ClientIdTextBox.Text;
+        }
+
+        private void AccessTokenTextBox_TextChanged(object sender, EventArgs e) {
+            Settings.AccessToken = AccessTokenTextBox.Text;
+        }
+
+        private void DiscordTokenTextBox_TextChanged(object sender, EventArgs e) {
+            Settings.DiscordToken = DiscordTokenTextBox.Text;
+        }
+
+        private void ClipsChannelTextBox_TextChanged(object sender, EventArgs e) {
+            if (ulong.TryParse(ClipsChannelTextBox.Text.Trim(), out var result)) {
+                Settings.ClipsChannel = result;
+                EventHandler handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, new EventArgs());
+            } else if (string.IsNullOrWhiteSpace(ClipsChannelTextBox.Text)) {
+                Settings.ClipsChannel = 0;
+                EventHandler handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, new EventArgs());
+            }
+        }
+
+        private void SummariesChannelTextBox_TextChanged(object sender, EventArgs e) {
+            if (ulong.TryParse(SummariesChannelTextBox.Text.Trim(), out var result)) {
+                Settings.SummariesChannel = result;
+                EventHandler handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, new EventArgs());
+            } else if (string.IsNullOrWhiteSpace(SummariesChannelTextBox.Text)) {
+                Settings.SummariesChannel = 0;
+                EventHandler handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, new EventArgs());
+            }
+        }
+
+        private void StartStopButton_Click(object sender, EventArgs e) {
+            if (!_isStarted) {
+                Logger.Debug("Started");
+                MainLogic.Setup().ConfigureAwait(false);
+            } else {
+                MainLogic.Stop();
+            }
+        }
 
         private void PostSummaryButton_Click(object sender, EventArgs e) {
             EventHandler handler = OnPostSummary;
@@ -222,16 +218,14 @@ namespace WipeClipperPlugin {
 
         private void ZoneTextBox_TextChanged(object sender, EventArgs e) {
             Regex.ChangeZone(ZoneTextBox.Text);
-            if (string.IsNullOrWhiteSpace(ZoneTextBox.Text)) {
-                Logger.Debug("Updated zone to any.");
-            } else {
-                Logger.Debug($"Updated zone to {ZoneTextBox.Text}");
-            }
+            var zoneName = string.IsNullOrWhiteSpace(ZoneTextBox.Text) ? "any" : ZoneTextBox.Text;
+            Logger.Debug($"Updated zone to {zoneName}.");
         }
 
         private void ManualClipKeywordTextBox_TextChanged(object sender, EventArgs e) {
             Regex.ChangeManualClipKeyword(ManualClipKeywordTextBox.Text);
-            Logger.Debug($"Updated manual keyword to {ManualClipKeywordTextBox.Text}");
+            var clipKeyword = string.IsNullOrWhiteSpace(ManualClipKeywordTextBox.Text) ? "any" : ManualClipKeywordTextBox.Text;
+            Logger.Debug($"Updated manual keyword to {clipKeyword}.");
         }
 
         private void ResetPullsButton_Click(object sender, EventArgs e) {

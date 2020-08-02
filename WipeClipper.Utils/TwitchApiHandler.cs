@@ -22,7 +22,7 @@ namespace DiscordAndTwitch {
                 var clips = new Dictionary<string, string>();
                 foreach (var channelPair in channelIDs) {
                     try {
-                        Logger.Debug($"Creating a clip for #{channelPair.Key}");
+                        Logger.Debug($"Creating a clip for #{channelPair.Key}.");
                         var clip = await _api.Helix.Clips.CreateClipAsync(channelPair.Value);
                         clips.Add(channelPair.Value, clip.CreatedClips[0].EditUrl.Replace("/edit", ""));
                     } catch (Exception e) {
