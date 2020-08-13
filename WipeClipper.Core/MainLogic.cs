@@ -6,15 +6,17 @@ using Advanced_Combat_Tracker;
 using DiscordAndTwitch;
 
 namespace WipeClipperPlugin {
-    class MainLogic {
+    internal class MainLogic {
+        public delegate void LabelChangedEventHandler(object sender, StatusChangedEventArgs args);
+
         private static bool _isStarted;
-        private static int _wipes = 0;
+        private static int _wipes;
         private static TimeSpan _pullTime;
+        private static TimeSpan _wipeTime = TimeSpan.MinValue;
         private static bool _isPulled;
         private static readonly List<int> _pullTimes = new List<int>();
+        private static readonly List<int> _timeBetweenPulls = new List<int>();
         private static readonly List<double> _breaks = new List<double>();
-
-        public delegate void LabelChangedEventHandler(object sender, StatusChangedEventArgs args);
         public static event LabelChangedEventHandler OnStatusLabelChanged;
 
         public static async Task Setup() {
@@ -65,14 +67,18 @@ namespace WipeClipperPlugin {
         public static void HandlePulled() {
             _pullTime = DateTime.Now.TimeOfDay;
             _isPulled = true;
+            if (_wipeTime != TimeSpan.MinValue) {
+                _timeBetweenPulls.Add((int)(DateTime.Now.TimeOfDay - _wipeTime).TotalSeconds);
+            }
         }
-        
+
         public static async void HandleWiped() {
             if (_isPulled) {
                 Logger.Debug("Clipping and sending message.");
                 _isPulled = false;
+                _wipeTime = DateTime.Now.TimeOfDay;
                 var clips = await TwitchApiHandler.MakeClip(Settings.UserIDs);
-                string message = "";
+                var message = "";
 
                 foreach (var userIdPair in Settings.UserIDs) {
                     try {
@@ -86,7 +92,7 @@ namespace WipeClipperPlugin {
                 var totalPullTime = DateTime.Now.TimeOfDay - _pullTime;
 
                 var isGreen = totalPullTime.TotalSeconds > Settings.GreenThreshold;
-                _pullTimes.Add((int)totalPullTime.TotalSeconds);
+                _pullTimes.Add((int) totalPullTime.TotalSeconds);
 
                 await Discord.SendMessage(message + "\n", $"Wipe #{++_wipes} - {totalPullTime:mm\\:ss}min", isGreen);
             }
@@ -96,7 +102,7 @@ namespace WipeClipperPlugin {
             Logger.Debug("Creating clip manually.");
 
             var clips = await TwitchApiHandler.MakeClip(Settings.UserIDs);
-            string message = "";
+            var message = "";
 
             foreach (var userIdPair in Settings.UserIDs) {
                 try {
@@ -117,8 +123,8 @@ namespace WipeClipperPlugin {
             }
 
             Logger.Debug("Posting summary.");
-            Stats.SavePlot(_pullTimes, _breaks);
-            var result = Stats.GetStats(_pullTimes);
+            Stats.CreatePlots(_pullTimes, _breaks, _timeBetweenPulls);
+            var result = Stats.GetStats(_pullTimes, _timeBetweenPulls);
             await Discord.SendSummary(result);
         }
 
@@ -129,6 +135,7 @@ namespace WipeClipperPlugin {
                     Logger.Error($"Channel {streamName} either does not exist or there has been an error with the API call. Please check the spelling and try again.");
                     return;
                 }
+
                 Settings.UserIDs.Add(streamName, id);
                 Logger.Debug($"Adding {streamName}:{id} to channels list.");
             }
@@ -139,7 +146,7 @@ namespace WipeClipperPlugin {
                 Logger.Debug($"Removing {streamName} from channels list.");
             }
         }
-        
+
         public static async void HandleDiscordChannelsChanged(object o, EventArgs e) {
             await Discord.UpdateChannels();
         }
@@ -150,7 +157,9 @@ namespace WipeClipperPlugin {
         }
 
         public static void Stop() {
-            if (!_isStarted) return;
+            if (!_isStarted) {
+                return;
+            }
 
             Logger.Debug("Stopping.");
             Discord.Disconnect();
@@ -165,10 +174,10 @@ namespace WipeClipperPlugin {
 
         public static void ChangeStatusLabel(bool working) {
             if (working) {
-                LabelChangedEventHandler handler = OnStatusLabelChanged;
+                var handler = OnStatusLabelChanged;
                 handler?.Invoke(null, new StatusChangedEventArgs(true));
             } else {
-                LabelChangedEventHandler handler = OnStatusLabelChanged;
+                var handler = OnStatusLabelChanged;
                 handler?.Invoke(null, new StatusChangedEventArgs(false));
             }
         }
@@ -182,6 +191,7 @@ namespace WipeClipperPlugin {
             Logger.Debug("Resetting pulls and breaks.");
             _pullTimes.Clear();
             _breaks.Clear();
+            _timeBetweenPulls.Clear();
         }
     }
 }

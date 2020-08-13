@@ -58,11 +58,13 @@ namespace WipeClipperPlugin {
             this.label8 = new System.Windows.Forms.Label();
             this.StatusLabel = new System.Windows.Forms.Label();
             this.ResetPullsButton = new System.Windows.Forms.Button();
+            this.TeaMechanicsCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.TeaMechanicsCheckBox);
             this.groupBox1.Controls.Add(this.ManualClipKeywordTextBox);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.GetCurrentZoneButton);
@@ -381,6 +383,17 @@ namespace WipeClipperPlugin {
             this.ResetPullsButton.UseVisualStyleBackColor = true;
             this.ResetPullsButton.Click += new System.EventHandler(this.ResetPullsButton_Click);
             // 
+            // TeaMechanicsCheckBox
+            // 
+            this.TeaMechanicsCheckBox.AutoSize = true;
+            this.TeaMechanicsCheckBox.Location = new System.Drawing.Point(417, 228);
+            this.TeaMechanicsCheckBox.Name = "TeaMechanicsCheckBox";
+            this.TeaMechanicsCheckBox.Size = new System.Drawing.Size(155, 17);
+            this.TeaMechanicsCheckBox.TabIndex = 16;
+            this.TeaMechanicsCheckBox.Text = "Add TEA mechanics to plot";
+            this.TeaMechanicsCheckBox.UseVisualStyleBackColor = true;
+            this.TeaMechanicsCheckBox.CheckedChanged += new System.EventHandler(this.TeaMechanicsCheckBox_CheckedChanged);
+            // 
             // MainControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -443,5 +456,6 @@ namespace WipeClipperPlugin {
         private TextBox ManualClipKeywordTextBox;
         private Label label10;
         private Button ResetPullsButton;
+        private CheckBox TeaMechanicsCheckBox;
     }
 }

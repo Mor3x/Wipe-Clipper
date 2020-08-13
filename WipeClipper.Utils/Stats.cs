@@ -9,9 +9,60 @@ using OxyPlot.WindowsForms;
 
 namespace DiscordAndTwitch {
     public class Stats {
+        private static readonly Dictionary<string, int> _teaMechTimes = new Dictionary<string, int> {
+            {"Dolls End", 80},
+            {"P2", 165},
+            {"Gavel", 300},
+            {"P3", 380},
+            {"Inception", 410},
+            {"Wormhole", 505}
+        };
 
-        public static void SavePlot(IEnumerable<int> pulls, IEnumerable<double> breaks) {
-            var model = new PlotModel {Title = $"Summary for {DateTime.Today.ToShortDateString()}"};
+        public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls) {
+            CreateSimplePlot(pulls, breaks);
+            CreateTimePlot(pulls, timeBetweenPulls);
+        }
+
+        public static Statistics GetStats(List<int> pulls, List<int> timeBetweenPulls) {
+            var orderedPulls = pulls.OrderBy(x => x).ToList();
+            int medianPull;
+            int totalTime = pulls.Sum() + timeBetweenPulls.Sum();
+
+            if (orderedPulls.Count % 2 == 0) {
+                medianPull = (orderedPulls[pulls.Count / 2] + orderedPulls[(pulls.Count / 2 - 1)]) / 2;
+            } else {
+                medianPull = orderedPulls.ElementAt(pulls.Count / 2);
+            }
+
+            var longestPull = pulls.Max();
+            double percentageSpentOnPulls = (double)pulls.Sum() / totalTime;
+            int timeSpentPulling = pulls.Sum();
+            var timeOnPullsPastThreshold = pulls.Where(x => x > Settings.GreenThreshold).Sum();
+
+            return new Statistics(pulls.Count, medianPull, longestPull, percentageSpentOnPulls, timeSpentPulling, timeOnPullsPastThreshold);
+        }
+
+        public class Statistics {
+            public int PullCount { get; }
+            public int MedianPull { get; }
+            public int LongestPull { get; }
+            public double PercentageSpentOnPulls { get; }
+            public int TimeSpentPulling { get; }
+            public int TimeSpentPullingPastThreshold { get; }
+
+            public Statistics(int count, int medianPull, int longestPull, double percentageSpentOnPulls, int timeSpentPulling, int timeSpentPastThreshold) {
+                PullCount = count;
+                MedianPull = medianPull;
+                LongestPull = longestPull;
+                PercentageSpentOnPulls = percentageSpentOnPulls * 100;
+                TimeSpentPulling = timeSpentPulling;
+                TimeSpentPullingPastThreshold = timeSpentPastThreshold;
+            }
+        }
+
+        private static void CreateSimplePlot(List<int> pulls, List<double> breaks) {
+            var model = new PlotModel { Title = $"Summary for {DateTime.Today.ToShortDateString()}" };
+
             var series = new LineSeries {
                 MarkerType = MarkerType.Circle,
                 MarkerFill = OxyColors.Blue,
@@ -20,23 +71,18 @@ namespace DiscordAndTwitch {
                 XAxisKey = "xAxis"
             };
 
-            var pullsList = pulls.ToList();
-            for (int i = 0; i < pullsList.Count; i++) {
-                series.Points.Add(new DataPoint(i + 1, pullsList[i]));
-            }
-
             var xAxis = new LinearAxis {
                 Key = "xAxis",
                 Position = AxisPosition.Bottom,
-                Title="Pull #",
+                Title = "Pull #",
                 AxisTitleDistance = 10,
                 Minimum = 0
             };
-            
+
             var yAxis = new LinearAxis {
                 Key = "yAxis",
                 Position = AxisPosition.Left,
-                Title="Pull time in seconds",
+                Title = "Pull time in seconds",
                 AxisTitleDistance = 20,
                 MaximumPadding = 0.05,
                 Minimum = 0
@@ -44,6 +90,10 @@ namespace DiscordAndTwitch {
 
             model.Axes.Add(xAxis);
             model.Axes.Add(yAxis);
+
+            for (int i = 0; i < pulls.Count; i++) {
+                series.Points.Add(new DataPoint(i + 1, pulls[i]));
+            }
 
             foreach (var breakTime in breaks) {
                 var line = new LineAnnotation {
@@ -56,28 +106,136 @@ namespace DiscordAndTwitch {
                 model.Annotations.Add(line);
             }
 
+            if (Settings.AddTeaMarkers) {
+                foreach (var mech in _teaMechTimes) {
+                    var line = new LineAnnotation {
+                        StrokeThickness = 1,
+                        Color = OxyColors.Red,
+                        Type = LineAnnotationType.Horizontal,
+                        Text = mech.Key,
+                        TextColor = OxyColors.Black,
+                        Y = mech.Value,
+                        TextLinePosition = 0,
+                        TextHorizontalAlignment = HorizontalAlignment.Left
+                    };
+                    model.Annotations.Add(line);
+                }
+            }
+
+            var thresholdLine = new LineAnnotation {
+                StrokeThickness = 1,
+                Color = OxyColors.Green,
+                LineStyle = LineStyle.Solid,
+                Type = LineAnnotationType.Horizontal,
+                Text = "Threshold",
+                TextColor = OxyColors.Black,
+                Y = Settings.GreenThreshold,
+                TextHorizontalAlignment = HorizontalAlignment.Right
+            };
+            model.Annotations.Add(thresholdLine);
+
             model.Series.Add(series);
             model.Padding = new OxyThickness(10, 10, 30, 10); // padding around the plot
 
-            var pngExporter = new PngExporter { Width = 600, Height = 400, Background = OxyColors.White };
-            pngExporter.ExportToFile(model, "plot.png");
+            var pngExporter = new PngExporter { Width = 800, Height = 600, Background = OxyColors.White };
+            pngExporter.ExportToFile(model, "simplePlot.png");
         }
 
-        public static (int amount, int median, int longest) GetStats(IEnumerable<int> pulls) {
-            var orderedPulls = pulls.OrderBy(x => x).ToList();
-            var pullsCount = pulls.Count();
-            int medianPull;
+        private static void CreateTimePlot(List<int> pulls, List<int> timeBetweenPulls) {
+            var model = new PlotModel { Title = $"Summary for {DateTime.Today.ToShortDateString()}" };
 
-            if (orderedPulls.Count % 2 == 0) {
-                medianPull = (orderedPulls[pullsCount / 2] + orderedPulls[(pullsCount / 2 - 1)]) / 2;
-            } else {
-                medianPull = orderedPulls.ElementAt(pullsCount / 2);
+            var timeSeries = new LineSeries {
+                MarkerType = MarkerType.Circle,
+                MarkerFill = OxyColors.Blue,
+                LineStyle = LineStyle.None,
+                YAxisKey = "yAxis",
+                XAxisKey = "xAxis"
+            };
+
+            var timeBreakSeries = new AreaSeries {
+                YAxisKey = "yAxis",
+                XAxisKey = "xAxis",
+                Color = OxyColors.Red
+            };
+
+            var xAxis = new TimeSpanAxis {
+                Key = "xAxis",
+                Position = AxisPosition.Bottom,
+                Title = "Time",
+                AxisTitleDistance = 10,
+                Minimum = TimeSpanAxis.ToDouble(new TimeSpan(0)),
+                MinimumPadding = 0.05
+            };
+
+            var yAxis = new LinearAxis {
+                Key = "yAxis",
+                Position = AxisPosition.Left,
+                Title = "Pull time in seconds",
+                AxisTitleDistance = 20,
+                MaximumPadding = 0.05,
+                Minimum = 0
+            };
+
+            model.Axes.Add(xAxis);
+            model.Axes.Add(yAxis);
+
+            var time = 0;
+            for (int i = 0; i < pulls.Count; i++) {
+                time += pulls[i];
+                timeSeries.Points.Add(new DataPoint(TimeSpanAxis.ToDouble(new TimeSpan(0, 0, time)), pulls[i]));
+                var shadow = new LineAnnotation {
+                    StrokeThickness = 1,
+                    Color = OxyColors.Blue,
+                    Type = LineAnnotationType.Vertical,
+                    X = time,
+                    MinimumY = 0,
+                    MaximumY = pulls[i]
+                };
+                model.Annotations.Add(shadow);
+
+                if (i != pulls.Count - 1) {
+                    timeBreakSeries.Points.Add(new DataPoint(TimeSpanAxis.ToDouble(new TimeSpan(0, 0, time - 1)), 0));
+                    timeBreakSeries.Points.Add(new DataPoint(TimeSpanAxis.ToDouble(new TimeSpan(0, 0, time)), 50));
+                    timeBreakSeries.Points.Add(new DataPoint(TimeSpanAxis.ToDouble(new TimeSpan(0, 0, time + timeBetweenPulls[i] - 1)), 50));
+                    timeBreakSeries.Points.Add(new DataPoint(TimeSpanAxis.ToDouble(new TimeSpan(0, 0, time + timeBetweenPulls[i])), 0));
+                    time += timeBetweenPulls[i];
+                }
             }
-            var longestPull = pulls.Max();
 
-            Console.WriteLine("Median: " + medianPull);
-            Console.WriteLine("Longest pull: " + longestPull);
-            return (pullsCount, medianPull, longestPull);
+            if (Settings.AddTeaMarkers) {
+                foreach (var mech in _teaMechTimes) {
+                    var line = new LineAnnotation {
+                        StrokeThickness = 1,
+                        Color = OxyColors.Red,
+                        Type = LineAnnotationType.Horizontal,
+                        Text = mech.Key,
+                        TextColor = OxyColors.Black,
+                        Y = mech.Value,
+                        TextLinePosition = 0,
+                        TextHorizontalAlignment = HorizontalAlignment.Left
+                    };
+                    model.Annotations.Add(line);
+                }
+            }
+
+            var thresholdLine = new LineAnnotation {
+                StrokeThickness = 1,
+                Color = OxyColors.Green,
+                LineStyle = LineStyle.Solid,
+                Type = LineAnnotationType.Horizontal,
+                Text = "Threshold",
+                TextColor = OxyColors.Black,
+                Y = Settings.GreenThreshold,
+                TextHorizontalAlignment = HorizontalAlignment.Right
+            };
+            model.Annotations.Add(thresholdLine);
+
+            model.Series.Add(timeBreakSeries);
+            model.Series.Add(timeSeries);
+            model.Padding = new OxyThickness(10, 10, 30, 10); // padding around the plot
+
+            var pngExporter = new PngExporter { Width = 1280, Height = 720, Background = OxyColors.White };
+            pngExporter.ExportToFile(model, "timePlot.png");
         }
     }
 }
