@@ -24,7 +24,7 @@ It's now ready to run. Please note that ACT might prompt you to unblock the dll,
 
 
 ## Setup 
-For the setup guide please refer to [wiki.](https://github.com/Mor3x/Wipe-Clipper/releases)
+For the setup guide please refer to the [wiki.](https://github.com/Mor3x/Wipe-Clipper/wiki)
 
 ## Things to keep in mind
 - The plugin only considers a pull valid if it was started with a countdown, "Engage" being the start of the pull.
