@@ -24,7 +24,7 @@ namespace WipeClipperPlugin {
                 return;
             }
 
-            await Task.Factory.StartNew(() => TwitchApiHandler.Setup());
+            await Task.Factory.StartNew(TwitchApiHandler.Setup);
 
             foreach (var streamName in Settings.Channels) {
                 var id = await TwitchApiHandler.GetUserIdByName(streamName);
@@ -45,20 +45,18 @@ namespace WipeClipperPlugin {
         }
 
         private static void OnLogLineRead(bool isImport, LogLineEventArgs logInfo) {
-            if (Regex.IsPull(logInfo.logLine)) {
-                if (Regex.IsCorrectZone(ActGlobals.oFormActMain.CurrentZone)) {
+            if (Regex.IsCorrectZone(ActGlobals.oFormActMain.CurrentZone)) {
+                if (Regex.IsPull(logInfo.logLine)) {
                     HandlePulled();
                 }
-            }
 
-            if (Regex.IsWipe(logInfo.logLine)) {
-                if (Regex.IsCorrectZone(ActGlobals.oFormActMain.CurrentZone)) {
+                if (Regex.IsWipe(logInfo.logLine)) {
                     HandleWiped();
                 }
-            }
 
-            if (Regex.IsManualClip(logInfo.logLine)) {
-                HandleManualClip();
+                if (Regex.IsManualClip(logInfo.logLine)) {
+                    HandleManualClip();
+                }
             }
         }
 
@@ -66,7 +64,7 @@ namespace WipeClipperPlugin {
             _pullTime = DateTime.Now.TimeOfDay;
             _isPulled = true;
         }
-        
+
         public static async void HandleWiped() {
             if (_isPulled) {
                 Logger.Debug("Clipping and sending message.");
