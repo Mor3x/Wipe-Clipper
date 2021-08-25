@@ -51,7 +51,7 @@ namespace DiscordAndTwitch {
 
                 var embed = new DiscordEmbedBuilder();
                 embed.WithAuthor(title);
-                embed.WithDescription(message);
+                embed.WithDescription(Formatter.Sanitize(message));
                 embed.WithTimestamp(DateTime.Today + time);
 
                 if (!isGreen.HasValue) {
