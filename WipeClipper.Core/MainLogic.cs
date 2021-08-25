@@ -180,6 +180,7 @@ namespace WipeClipperPlugin {
             Logger.Debug("Resetting pulls and breaks.");
             _pullTimes.Clear();
             _breaks.Clear();
+            _wipes = 0;
         }
     }
 }
