@@ -24,7 +24,7 @@ It's now ready to run. Please note that ACT might prompt you to unblock the dll,
 
 
 ## Setup 
-For the setup guide please refer to the [wiki.](https://github.com/Mor3x/Wipe-Clipper/releases)
+For the setup guide please refer to the [wiki.](https://github.com/Mor3x/Wipe-Clipper/wiki)
 
 ## Things to keep in mind
 - The plugin only considers a pull valid if it was started with a countdown, "Engage" being the start of the pull.
@@ -32,6 +32,7 @@ For the setup guide please refer to the [wiki.](https://github.com/Mor3x/Wipe-Cl
 - No entry for "Clip keyword" means the feature is disabled.
 - If you have 2 sessions of raids without an ACT restart in between, you need to click Reset Pulls, otherwise 
 the pulls from the last session will still count towards the pull number and on the summary.
+- Currently only english, german and french game languages are supported.
 
 ## Questions and feature suggestions
 If you have any questions, bug reports and/or feature requests, please submit them [here](https://github.com/Mor3x/Wipe-Clipper/issues),
