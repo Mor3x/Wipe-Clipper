@@ -69,7 +69,7 @@ namespace DiscordAndTwitch {
             }
         }
 
-        public static async Task SendSummary((int count, int median, int longest) stats) {
+        public static async Task SendSummary(Stats.Statistics stats) {
             try {
                 Logger.Debug("Sending stats.");
 
@@ -77,17 +77,22 @@ namespace DiscordAndTwitch {
 
                 var embed = new DiscordEmbedBuilder();
                 embed.WithAuthor($"Summary for {DateTime.Now.Date.ToShortDateString()}");
-                embed.AddField("Number of pulls", $"{stats.count}");
-                embed.AddField("Median pull", $"{stats.median}s");
-                embed.AddField("Longest pull", $"{stats.longest}s");
+                embed.AddField("Number of pulls", $"{stats.PullCount}");
+                embed.AddField("Median pull", $"{stats.MedianPull}s");
+                embed.AddField("Longest pull", $"{stats.LongestPull}s");
+                embed.AddField("Time % spent on pulls", $"{Math.Round(stats.PercentageSpentOnPulls, 2)}%");
+                embed.AddField("Time spent on pulls", $"{new TimeSpan(0, 0,stats.TimeSpentPulling):h\\:mm\\:ss}");
+                embed.AddField($"Time spent on pulls past {Settings.GreenThreshold}s", $"{new TimeSpan(0, 0,stats.TimeSpentPullingPastThreshold):h\\:mm\\:ss}");
                 embed.WithColor(DiscordColor.White);
                 embed.WithTimestamp(DateTime.Today + time);
 
                 embed.Build();
 
                 await Bot.SendMessageAsync(SummaryChannel, null, false, embed);
-                await SummaryChannel.SendFileAsync("plot.png");
-                File.Delete("plot.png");
+                await SummaryChannel.SendFileAsync("simplePlot.png");
+                await SummaryChannel.SendFileAsync("timePlot.png");
+                File.Delete("simplePlot.png");
+                File.Delete("timePlot.png");
                 Logger.Debug("Stats sent.");
             } catch (Exception e) {
                 Logger.Error("Error while sending summary to Discord. Please make sure the summary channel ID is correct.", e);

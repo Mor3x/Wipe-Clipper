@@ -8,6 +8,7 @@ namespace DiscordAndTwitch {
         public static ulong ClipsChannel = 0;
         public static ulong SummariesChannel = 0;
         public static int GreenThreshold;
+        public static bool AddTeaMarkers;
 
         public static List<string> Channels = new List<string>();
         public static Dictionary<string, string> UserIDs = new Dictionary<string, string>();

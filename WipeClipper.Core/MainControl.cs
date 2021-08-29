@@ -231,5 +231,9 @@ namespace WipeClipperPlugin {
         private void ResetPullsButton_Click(object sender, EventArgs e) {
             MainLogic.ResetPulls();
         }
+
+        private void TeaMechanicsCheckBox_CheckedChanged(object sender, EventArgs e) {
+            Settings.AddTeaMarkers = TeaMechanicsCheckBox.Checked;
+        }
     }
 }
