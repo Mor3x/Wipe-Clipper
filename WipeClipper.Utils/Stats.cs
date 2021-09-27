@@ -18,7 +18,10 @@ namespace DiscordAndTwitch {
             {"Wormhole", 505}
         };
 
-        public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls) {
+        private static Preset _preset;
+
+        public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls, Preset preset) {
+            _preset = preset;
             CreateSimplePlot(pulls, breaks);
             CreateTimePlot(pulls, timeBetweenPulls);
         }
@@ -37,7 +40,7 @@ namespace DiscordAndTwitch {
             var longestPull = pulls.Max();
             double percentageSpentOnPulls = (double)pulls.Sum() / totalTime;
             int timeSpentPulling = pulls.Sum();
-            var timeOnPullsPastThreshold = pulls.Where(x => x > Settings.GreenThreshold).Sum();
+            var timeOnPullsPastThreshold = pulls.Where(x => x > _preset.settings.GreenThreshold).Sum();
 
             return new Statistics(pulls.Count, medianPull, longestPull, percentageSpentOnPulls, timeSpentPulling, timeOnPullsPastThreshold);
         }
@@ -106,7 +109,7 @@ namespace DiscordAndTwitch {
                 model.Annotations.Add(line);
             }
 
-            if (Settings.AddTeaMarkers) {
+            if (_preset.settings.AddTeaMarkers) {
                 foreach (var mech in _teaMechTimes) {
                     var line = new LineAnnotation {
                         StrokeThickness = 1,
@@ -129,7 +132,7 @@ namespace DiscordAndTwitch {
                 Type = LineAnnotationType.Horizontal,
                 Text = "Threshold",
                 TextColor = OxyColors.Black,
-                Y = Settings.GreenThreshold,
+                Y = _preset.settings.GreenThreshold,
                 TextHorizontalAlignment = HorizontalAlignment.Right
             };
             model.Annotations.Add(thresholdLine);
@@ -202,7 +205,7 @@ namespace DiscordAndTwitch {
                 }
             }
 
-            if (Settings.AddTeaMarkers) {
+            if (_preset.settings.AddTeaMarkers) {
                 foreach (var mech in _teaMechTimes) {
                     var line = new LineAnnotation {
                         StrokeThickness = 1,
@@ -225,7 +228,7 @@ namespace DiscordAndTwitch {
                 Type = LineAnnotationType.Horizontal,
                 Text = "Threshold",
                 TextColor = OxyColors.Black,
-                Y = Settings.GreenThreshold,
+                Y = _preset.settings.GreenThreshold,
                 TextHorizontalAlignment = HorizontalAlignment.Right
             };
             model.Annotations.Add(thresholdLine);

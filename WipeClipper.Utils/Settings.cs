@@ -2,15 +2,17 @@
 
 namespace DiscordAndTwitch {
     public class Settings {
-        public static string ClientId;
-        public static string AccessToken;
-        public static string DiscordToken;
-        public static ulong ClipsChannel = 0;
-        public static ulong SummariesChannel = 0;
-        public static int GreenThreshold;
-        public static bool AddTeaMarkers;
+        public string ClientId;
+        public string AccessToken;
+        public string DiscordToken;
+        public ulong ClipsChannel = 0;
+        public ulong SummariesChannel = 0;
+        public int GreenThreshold;
+        public bool AddTeaMarkers;
+        public string Zone = "";
+        public string ClipKeyword = "";
 
-        public static List<string> Channels = new List<string>();
+        public List<string> Channels = new List<string>();
         public static Dictionary<string, string> UserIDs = new Dictionary<string, string>();
     }
 }

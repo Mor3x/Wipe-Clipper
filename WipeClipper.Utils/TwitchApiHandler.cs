@@ -7,14 +7,14 @@ namespace DiscordAndTwitch {
     public class TwitchApiHandler {
         private static TwitchAPI _api;
 
-        public static void Setup() {
+        public static void Setup(Preset preset) {
             Logger.Debug("Setting up Twitch API.");
             var dummy = typeof(TwitchLib.Api.Core.ApiBase); // otherwise there's an exception that core doesn't load lmao
             Console.WriteLine(dummy.FullName);
 
             _api = new TwitchAPI();
-            _api.Settings.ClientId = Settings.ClientId;
-            _api.Settings.AccessToken = Settings.AccessToken;
+            _api.Settings.ClientId = preset.settings.ClientId;
+            _api.Settings.AccessToken = preset.settings.AccessToken;
         }
 
         public static async Task<Dictionary<string, string>> MakeClip(Dictionary<string, string> channelIDs) {

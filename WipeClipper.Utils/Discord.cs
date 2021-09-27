@@ -9,9 +9,11 @@ namespace DiscordAndTwitch {
         private static DiscordClient Bot;
         private static DiscordChannel ClipChannel;
         private static DiscordChannel SummaryChannel;
+        private static Preset _preset;
 
-        public static async Task SetupBot(ulong clipChannel, ulong summaryChannel) {
+        public static async Task SetupBot(ulong clipChannel, ulong summaryChannel, Preset preset) {
             try {
+                _preset = preset;
                 SetupBotCredentials();
                 await Connect();
                 Logger.Debug("Discord connected.");
@@ -34,7 +36,7 @@ namespace DiscordAndTwitch {
         private static void SetupBotCredentials() {
             Bot = new DiscordClient(new DiscordConfiguration {
                 AutoReconnect = true,
-                Token = Settings.DiscordToken,
+                Token = _preset.settings.DiscordToken,
                 TokenType = TokenType.Bot,
                 UseInternalLogHandler = false,
             });
@@ -82,7 +84,7 @@ namespace DiscordAndTwitch {
                 embed.AddField("Longest pull", $"{stats.LongestPull}s");
                 embed.AddField("Time % spent on pulls", $"{Math.Round(stats.PercentageSpentOnPulls, 2)}%");
                 embed.AddField("Time spent on pulls", $"{new TimeSpan(0, 0,stats.TimeSpentPulling):h\\:mm\\:ss}");
-                embed.AddField($"Time spent on pulls past {Settings.GreenThreshold}s", $"{new TimeSpan(0, 0,stats.TimeSpentPullingPastThreshold):h\\:mm\\:ss}");
+                embed.AddField($"Time spent on pulls past {_preset.settings.GreenThreshold}s", $"{new TimeSpan(0, 0,stats.TimeSpentPullingPastThreshold):h\\:mm\\:ss}");
                 embed.WithColor(DiscordColor.White);
                 embed.WithTimestamp(DateTime.Today + time);
 
@@ -102,12 +104,12 @@ namespace DiscordAndTwitch {
         public static async Task UpdateChannels() {
             Logger.Debug("Updating discord channels.");
             try {
-                if (Settings.ClipsChannel != 0) {
-                    ClipChannel = await Bot.GetChannelAsync(Settings.ClipsChannel);
+                if (_preset.settings.ClipsChannel != 0) {
+                    ClipChannel = await Bot.GetChannelAsync(_preset.settings.ClipsChannel);
                 }
 
-                if (Settings.SummariesChannel != 0) {
-                    SummaryChannel = await Bot.GetChannelAsync(Settings.SummariesChannel);
+                if (_preset.settings.SummariesChannel != 0) {
+                    SummaryChannel = await Bot.GetChannelAsync(_preset.settings.SummariesChannel);
                 }
             } catch (Exception e) {
                 Logger.Error("Error while updating Discord channels. Please make sure the ID's are correct.", e);

@@ -26,6 +26,7 @@ namespace WipeClipperPlugin {
         /// </summary>
         private void InitializeComponent() {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.TeaMechanicsCheckBox = new System.Windows.Forms.CheckBox();
             this.ManualClipKeywordTextBox = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.GetCurrentZoneButton = new System.Windows.Forms.Button();
@@ -58,7 +59,12 @@ namespace WipeClipperPlugin {
             this.label8 = new System.Windows.Forms.Label();
             this.StatusLabel = new System.Windows.Forms.Label();
             this.ResetPullsButton = new System.Windows.Forms.Button();
-            this.TeaMechanicsCheckBox = new System.Windows.Forms.CheckBox();
+            this.presetsLabel = new System.Windows.Forms.Label();
+            this.loadPresetButton = new System.Windows.Forms.Button();
+            this.deletePresetButton = new System.Windows.Forms.Button();
+            this.presetsComboBox = new System.Windows.Forms.ComboBox();
+            this.newPresetName = new System.Windows.Forms.TextBox();
+            this.savePresetButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,6 +94,17 @@ namespace WipeClipperPlugin {
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
+            // 
+            // TeaMechanicsCheckBox
+            // 
+            this.TeaMechanicsCheckBox.AutoSize = true;
+            this.TeaMechanicsCheckBox.Location = new System.Drawing.Point(417, 228);
+            this.TeaMechanicsCheckBox.Name = "TeaMechanicsCheckBox";
+            this.TeaMechanicsCheckBox.Size = new System.Drawing.Size(155, 17);
+            this.TeaMechanicsCheckBox.TabIndex = 16;
+            this.TeaMechanicsCheckBox.Text = "Add TEA mechanics to plot";
+            this.TeaMechanicsCheckBox.UseVisualStyleBackColor = true;
+            this.TeaMechanicsCheckBox.CheckedChanged += new System.EventHandler(this.TeaMechanicsCheckBox_CheckedChanged);
             // 
             // ManualClipKeywordTextBox
             // 
@@ -383,21 +400,70 @@ namespace WipeClipperPlugin {
             this.ResetPullsButton.UseVisualStyleBackColor = true;
             this.ResetPullsButton.Click += new System.EventHandler(this.ResetPullsButton_Click);
             // 
-            // TeaMechanicsCheckBox
+            // presetsLabel
             // 
-            this.TeaMechanicsCheckBox.AutoSize = true;
-            this.TeaMechanicsCheckBox.Location = new System.Drawing.Point(417, 228);
-            this.TeaMechanicsCheckBox.Name = "TeaMechanicsCheckBox";
-            this.TeaMechanicsCheckBox.Size = new System.Drawing.Size(155, 17);
-            this.TeaMechanicsCheckBox.TabIndex = 16;
-            this.TeaMechanicsCheckBox.Text = "Add TEA mechanics to plot";
-            this.TeaMechanicsCheckBox.UseVisualStyleBackColor = true;
-            this.TeaMechanicsCheckBox.CheckedChanged += new System.EventHandler(this.TeaMechanicsCheckBox_CheckedChanged);
+            this.presetsLabel.AutoSize = true;
+            this.presetsLabel.Location = new System.Drawing.Point(589, 180);
+            this.presetsLabel.Name = "presetsLabel";
+            this.presetsLabel.Size = new System.Drawing.Size(42, 13);
+            this.presetsLabel.TabIndex = 21;
+            this.presetsLabel.Text = "Presets";
+            // 
+            // loadPresetButton
+            // 
+            this.loadPresetButton.Location = new System.Drawing.Point(721, 196);
+            this.loadPresetButton.Name = "loadPresetButton";
+            this.loadPresetButton.Size = new System.Drawing.Size(75, 23);
+            this.loadPresetButton.TabIndex = 23;
+            this.loadPresetButton.Text = "Load Preset";
+            this.loadPresetButton.UseVisualStyleBackColor = true;
+            this.loadPresetButton.Click += new System.EventHandler(this.loadPresetButton_Click);
+            // 
+            // deletePresetButton
+            // 
+            this.deletePresetButton.Location = new System.Drawing.Point(802, 196);
+            this.deletePresetButton.Name = "deletePresetButton";
+            this.deletePresetButton.Size = new System.Drawing.Size(81, 23);
+            this.deletePresetButton.TabIndex = 24;
+            this.deletePresetButton.Text = "Delete Preset";
+            this.deletePresetButton.UseVisualStyleBackColor = true;
+            this.deletePresetButton.Click += new System.EventHandler(this.deletePresetButton_Click);
+            // 
+            // presetsComboBox
+            // 
+            this.presetsComboBox.FormattingEnabled = true;
+            this.presetsComboBox.Location = new System.Drawing.Point(592, 197);
+            this.presetsComboBox.Name = "presetsComboBox";
+            this.presetsComboBox.Size = new System.Drawing.Size(121, 21);
+            this.presetsComboBox.TabIndex = 25;
+            // 
+            // newPresetName
+            // 
+            this.newPresetName.Location = new System.Drawing.Point(592, 224);
+            this.newPresetName.Name = "newPresetName";
+            this.newPresetName.Size = new System.Drawing.Size(121, 20);
+            this.newPresetName.TabIndex = 26;
+            // 
+            // savePresetButton
+            // 
+            this.savePresetButton.Location = new System.Drawing.Point(721, 223);
+            this.savePresetButton.Name = "savePresetButton";
+            this.savePresetButton.Size = new System.Drawing.Size(75, 22);
+            this.savePresetButton.TabIndex = 27;
+            this.savePresetButton.Text = "Save Preset";
+            this.savePresetButton.UseVisualStyleBackColor = true;
+            this.savePresetButton.Click += new System.EventHandler(this.savePresetButton_Click);
             // 
             // MainControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.savePresetButton);
+            this.Controls.Add(this.newPresetName);
+            this.Controls.Add(this.presetsComboBox);
+            this.Controls.Add(this.deletePresetButton);
+            this.Controls.Add(this.loadPresetButton);
+            this.Controls.Add(this.presetsLabel);
             this.Controls.Add(this.ResetPullsButton);
             this.Controls.Add(this.StatusLabel);
             this.Controls.Add(this.label8);
@@ -457,5 +523,11 @@ namespace WipeClipperPlugin {
         private Label label10;
         private Button ResetPullsButton;
         private CheckBox TeaMechanicsCheckBox;
+        private Label presetsLabel;
+        private Button loadPresetButton;
+        private Button deletePresetButton;
+        private ComboBox presetsComboBox;
+        private TextBox newPresetName;
+        private Button savePresetButton;
     }
 }
