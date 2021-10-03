@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -10,8 +10,8 @@ using Newtonsoft.Json;
 
 namespace WipeClipperPlugin {
     public partial class MainControl : UserControl, IActPluginV1 {
-        private static List<Preset> _presets = new List<Preset>();
-        private static Preset CurrentPreset = new Preset("default");
+        private static BindingList<Preset> _presets = new BindingList<Preset>();
+        private static Preset CurrentPreset = new Preset("");
 
         private readonly string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\WipeClipper.config.json");
         private bool _isStarted;
@@ -26,6 +26,7 @@ namespace WipeClipperPlugin {
             pluginScreenSpace.Text = "Wipe Clipper";
             Dock = DockStyle.Fill;
 
+            presetsComboBox.DataSource = _presets;
             LoadSettings();
 
             Logger.Log += Log;
@@ -85,11 +86,11 @@ namespace WipeClipperPlugin {
             if (ulong.TryParse(ClipsChannelTextBox.Text.Trim(), out var result)) {
                 CurrentPreset.settings.ClipsChannel = result;
                 var handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             } else if (string.IsNullOrWhiteSpace(ClipsChannelTextBox.Text)) {
                 CurrentPreset.settings.ClipsChannel = 0;
                 var handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -97,11 +98,11 @@ namespace WipeClipperPlugin {
             if (ulong.TryParse(SummariesChannelTextBox.Text.Trim(), out var result)) {
                 CurrentPreset.settings.SummariesChannel = result;
                 var handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             } else if (string.IsNullOrWhiteSpace(SummariesChannelTextBox.Text)) {
                 CurrentPreset.settings.SummariesChannel = 0;
                 var handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -116,7 +117,7 @@ namespace WipeClipperPlugin {
 
         private void PostSummaryButton_Click(object sender, EventArgs e) {
             var handler = OnPostSummary;
-            handler?.Invoke(this, new EventArgs());
+            handler?.Invoke(this, EventArgs.Empty);
         }
 
         private void AddBreakButton_Click(object sender, EventArgs e) {
@@ -138,7 +139,7 @@ namespace WipeClipperPlugin {
                 ChannelTextBox.Text = "";
                 CurrentPreset.settings.Channels.Add(channelName);
                 var handler = OnChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -154,13 +155,13 @@ namespace WipeClipperPlugin {
                 }
 
                 var handler = OnChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void ChannelTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter) {
-                AddChannelButton_Click(sender, new EventArgs());
+                AddChannelButton_Click(sender, EventArgs.Empty);
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
@@ -180,7 +181,7 @@ namespace WipeClipperPlugin {
         private void ManualClipKeywordTextBox_TextChanged(object sender, EventArgs e) {
             CurrentPreset.settings.ClipKeyword = ManualClipKeywordTextBox.Text;
             Regex.ChangeManualClipKeyword(ManualClipKeywordTextBox.Text);
-            var clipKeyword = string.IsNullOrWhiteSpace(ManualClipKeywordTextBox.Text) ? "any" : ManualClipKeywordTextBox.Text;
+            var clipKeyword = string.IsNullOrWhiteSpace(ManualClipKeywordTextBox.Text) ? "nothing" : ManualClipKeywordTextBox.Text;
             Logger.Debug($"Updated manual keyword to {clipKeyword}.");
         }
 
@@ -210,28 +211,23 @@ namespace WipeClipperPlugin {
             if (((Preset)presetsComboBox.SelectedItem).Name == CurrentPreset.Name) {
                 CurrentPreset.Name = "";
             }
-            _presets.Remove((Preset)presetsComboBox.SelectedItem);
-            presetsComboBox.Items.Remove(presetsComboBox.SelectedItem);
-            presetsComboBox.SelectedItem = null;
+            var preset = _presets.ToList().Find(item => item.Name.ToLower() == ((Preset)presetsComboBox.SelectedItem).Name.ToLower());
+            _presets.Remove(preset);
             Logger.Debug("Removed preset!");
         }
 
         private void savePresetButton_Click(object sender, EventArgs e) {
             CurrentPreset.Name = newPresetName.Text;
             if (_presets.Count(x => x.Name == CurrentPreset.Name) > 0) {
-                var preset = _presets.Find(item => item.Name == newPresetName.Text);
+                var preset = _presets.ToList().Find(item => item.Name.ToLower() == newPresetName.Text.ToLower());
                 preset.LoadPreset(CurrentPreset);
-                foreach (var comboPreset in presetsComboBox.Items) {
-                    if (((Preset)comboPreset).Name == newPresetName.Text) {
-                        ((Preset)comboPreset).LoadPreset(CurrentPreset);
-                    }
-                }
+                presetsComboBox.SelectedItem = preset;
+
             } else {
-                CurrentPreset.Name = newPresetName.Text;
-                _presets.Add(CurrentPreset);
                 var newPreset = new Preset("");
                 newPreset.LoadPreset(CurrentPreset);
-                presetsComboBox.Items.Add(newPreset);
+                _presets.Add(newPreset);
+                presetsComboBox.SelectedItem = newPreset;
             }
 
             Logger.Debug($"Saved preset {newPresetName.Text}!");
@@ -254,10 +250,7 @@ namespace WipeClipperPlugin {
                         CurrentPreset = deserialized.Current;
                         AutoStartCheckBox.Checked = deserialized.Autostart;
 
-                        presetsComboBox.Items.Clear();
-                        _presets.ForEach(item => presetsComboBox.Items.Add(item));
-
-                        presetsComboBox.Text = CurrentPreset.Name;
+                        presetsComboBox.SelectedItem = _presets.ToList().Find(item => item.Name.ToLower() == CurrentPreset.Name.ToLower());
                         newPresetName.Text = CurrentPreset.Name;
 
                         LoadFromCurrentPreset();

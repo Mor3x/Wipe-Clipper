@@ -10,7 +10,7 @@ namespace DiscordAndTwitch {
         public int GreenThreshold;
         public bool AddTeaMarkers;
         public string Zone = "";
-        public string ClipKeyword = "";
+        public string ClipKeyword = "!clip";
 
         public List<string> Channels = new List<string>();
         public static Dictionary<string, string> UserIDs = new Dictionary<string, string>();
