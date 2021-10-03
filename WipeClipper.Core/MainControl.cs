@@ -207,6 +207,9 @@ namespace WipeClipperPlugin {
         }
 
         private void deletePresetButton_Click(object sender, EventArgs e) {
+            if (((Preset)presetsComboBox.SelectedItem).Name == CurrentPreset.Name) {
+                CurrentPreset.Name = "";
+            }
             _presets.Remove((Preset)presetsComboBox.SelectedItem);
             presetsComboBox.Items.Remove(presetsComboBox.SelectedItem);
             presetsComboBox.SelectedItem = null;
@@ -289,6 +292,7 @@ namespace WipeClipperPlugin {
             TeaMechanicsCheckBox.Checked = CurrentPreset.settings.AddTeaMarkers;
             ZoneTextBox.Text = CurrentPreset.settings.Zone;
             ManualClipKeywordTextBox.Text = CurrentPreset.settings.ClipKeyword;
+            newPresetName.Text = CurrentPreset.Name;
         }
 
         #endregion
