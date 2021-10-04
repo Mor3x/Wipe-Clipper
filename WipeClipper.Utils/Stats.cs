@@ -7,7 +7,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class Stats {
         private static readonly Dictionary<string, int> _teaMechTimes = new Dictionary<string, int> {
             {"Dolls End", 80},
@@ -20,10 +20,12 @@ namespace DiscordAndTwitch {
 
         private static Preset _preset;
 
-        public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls, Preset preset) {
+        public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls, Preset preset, bool includeTimePlot) {
             _preset = preset;
             CreateSimplePlot(pulls, breaks);
-            CreateTimePlot(pulls, timeBetweenPulls);
+            if (includeTimePlot) {
+                CreateTimePlot(pulls, timeBetweenPulls);
+            }
         }
 
         public static Statistics GetStats(List<int> pulls, List<int> timeBetweenPulls) {
@@ -141,7 +143,7 @@ namespace DiscordAndTwitch {
             model.Padding = new OxyThickness(10, 10, 30, 10); // padding around the plot
 
             var pngExporter = new PngExporter { Width = 800, Height = 600, Background = OxyColors.White };
-            pngExporter.ExportToFile(model, "simplePlot.png");
+            pngExporter.ExportToFile(model, "plot.png");
         }
 
         private static void CreateTimePlot(List<int> pulls, List<int> timeBetweenPulls) {

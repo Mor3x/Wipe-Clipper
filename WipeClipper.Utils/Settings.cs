@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class Settings {
         public string ClientId;
         public string AccessToken;

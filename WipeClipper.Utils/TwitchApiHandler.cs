@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class TwitchApiHandler {
         private static TwitchAPI _api;
 

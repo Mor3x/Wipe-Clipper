@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Advanced_Combat_Tracker;
-using DiscordAndTwitch;
+using WipeClipper.Core;
+using WipeClipperUtils;
 
 namespace WipeClipperPlugin {
     internal class MainLogic {
@@ -124,9 +125,9 @@ namespace WipeClipperPlugin {
             }
 
             Logger.Debug("Posting summary.");
-            Stats.CreatePlots(_pullTimes, _breaks, _timeBetweenPulls, _preset);
+            Stats.CreatePlots(_pullTimes, _breaks, _timeBetweenPulls, _preset, AppSettings.IncludeTimePlot);
             var result = Stats.GetStats(_pullTimes, _timeBetweenPulls);
-            await Discord.SendSummary(result);
+            await Discord.SendSummary(result, AppSettings.IncludeTimePlot);
         }
 
         public static async void HandleChannelsChanged(object o, EventArgs e) {

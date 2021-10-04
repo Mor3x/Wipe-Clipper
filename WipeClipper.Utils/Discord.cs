@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class Discord {
         private static DiscordClient Bot;
         private static DiscordChannel ClipChannel;
@@ -22,11 +22,13 @@ namespace DiscordAndTwitch {
                     Logger.Error("Please enter a clip channel ID.");
                     return;
                 }
+
                 ClipChannel = await Bot.GetChannelAsync(clipChannel);
 
                 if (summaryChannel == 0) {
                     return;
                 }
+
                 SummaryChannel = await Bot.GetChannelAsync(summaryChannel);
             } catch (Exception e) {
                 Logger.Error("Error on Discord initialization.", e);
@@ -38,7 +40,7 @@ namespace DiscordAndTwitch {
                 AutoReconnect = true,
                 Token = _preset.settings.DiscordToken,
                 TokenType = TokenType.Bot,
-                UseInternalLogHandler = false,
+                UseInternalLogHandler = false
             });
         }
 
@@ -71,7 +73,7 @@ namespace DiscordAndTwitch {
             }
         }
 
-        public static async Task SendSummary(Stats.Statistics stats) {
+        public static async Task SendSummary(Stats.Statistics stats, bool includeTimePlot) {
             try {
                 Logger.Debug("Sending stats.");
 
@@ -83,18 +85,24 @@ namespace DiscordAndTwitch {
                 embed.AddField("Median pull", $"{stats.MedianPull}s");
                 embed.AddField("Longest pull", $"{stats.LongestPull}s");
                 embed.AddField("Time % spent on pulls", $"{Math.Round(stats.PercentageSpentOnPulls, 2)}%");
-                embed.AddField("Time spent on pulls", $"{new TimeSpan(0, 0,stats.TimeSpentPulling):h\\:mm\\:ss}");
-                embed.AddField($"Time spent on pulls past {_preset.settings.GreenThreshold}s", $"{new TimeSpan(0, 0,stats.TimeSpentPullingPastThreshold):h\\:mm\\:ss}");
+                embed.AddField("Time spent on pulls", $"{new TimeSpan(0, 0, stats.TimeSpentPulling):h\\:mm\\:ss}");
+                embed.AddField($"Time spent on pulls past {_preset.settings.GreenThreshold}s", $"{new TimeSpan(0, 0, stats.TimeSpentPullingPastThreshold):h\\:mm\\:ss}");
                 embed.WithColor(DiscordColor.White);
                 embed.WithTimestamp(DateTime.Today + time);
 
                 embed.Build();
 
                 await Bot.SendMessageAsync(SummaryChannel, null, false, embed);
-                await SummaryChannel.SendFileAsync("simplePlot.png");
-                await SummaryChannel.SendFileAsync("timePlot.png");
-                File.Delete("simplePlot.png");
-                File.Delete("timePlot.png");
+                await SummaryChannel.SendFileAsync("plot.png");
+                if (includeTimePlot) {
+                    await SummaryChannel.SendFileAsync("timePlot.png");
+                }
+
+                File.Delete("plot.png");
+                if (includeTimePlot) {
+                    File.Delete("timePlot.png");
+                }
+
                 Logger.Debug("Stats sent.");
             } catch (Exception e) {
                 Logger.Error("Error while sending summary to Discord. Please make sure the summary channel ID is correct.", e);

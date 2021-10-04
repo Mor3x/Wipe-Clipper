@@ -5,8 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
-using DiscordAndTwitch;
 using Newtonsoft.Json;
+using WipeClipper.Core;
+using WipeClipperUtils;
 
 namespace WipeClipperPlugin {
     public partial class MainControl : UserControl, IActPluginV1 {
@@ -25,11 +26,11 @@ namespace WipeClipperPlugin {
             pluginStatusText.Text = "Ready.";
             pluginScreenSpace.Text = "Wipe Clipper";
             Dock = DockStyle.Fill;
+            Logger.Log += Log;
 
             presetsComboBox.DataSource = _presets;
             LoadSettings();
 
-            Logger.Log += Log;
             MainLogic.OnStatusLabelChanged += HandleStatusChanged;
             Logger.Debug("Loaded.");
 
@@ -211,6 +212,7 @@ namespace WipeClipperPlugin {
             if (((Preset)presetsComboBox.SelectedItem).Name == CurrentPreset.Name) {
                 CurrentPreset.Name = "";
             }
+
             var preset = _presets.ToList().Find(item => item.Name.ToLower() == ((Preset)presetsComboBox.SelectedItem).Name.ToLower());
             _presets.Remove(preset);
             Logger.Debug("Removed preset!");
@@ -222,7 +224,6 @@ namespace WipeClipperPlugin {
                 var preset = _presets.ToList().Find(item => item.Name.ToLower() == newPresetName.Text.ToLower());
                 preset.LoadPreset(CurrentPreset);
                 presetsComboBox.SelectedItem = preset;
-
             } else {
                 var newPreset = new Preset("");
                 newPreset.LoadPreset(CurrentPreset);
@@ -231,6 +232,14 @@ namespace WipeClipperPlugin {
             }
 
             Logger.Debug($"Saved preset {newPresetName.Text}!");
+        }
+
+        private void includeTimePlotCheckBox_CheckedChanged(object sender, EventArgs e) {
+            AppSettings.IncludeTimePlot = includeTimePlotCheckBox.Checked;
+        }
+
+        private void AutoStartCheckBox_CheckedChanged(object sender, EventArgs e) {
+            AppSettings.AutoStart = AutoStartCheckBox.Checked;
         }
 
         #region Settings
@@ -243,12 +252,17 @@ namespace WipeClipperPlugin {
                         var definition = new {
                             Presets = _presets,
                             Current = CurrentPreset,
-                            Autostart = false
+                            AppSettings = new AppSettings()
                         };
+                        Logger.Debug(fileContent);
                         var deserialized = JsonConvert.DeserializeAnonymousType(fileContent, definition);
+
                         _presets = deserialized.Presets;
+                        presetsComboBox.DataSource = _presets;
                         CurrentPreset = deserialized.Current;
-                        AutoStartCheckBox.Checked = deserialized.Autostart;
+
+                        AutoStartCheckBox.Checked = AppSettings.AutoStart;
+                        includeTimePlotCheckBox.Checked = AppSettings.IncludeTimePlot;
 
                         presetsComboBox.SelectedItem = _presets.ToList().Find(item => item.Name.ToLower() == CurrentPreset.Name.ToLower());
                         newPresetName.Text = CurrentPreset.Name;
@@ -267,7 +281,7 @@ namespace WipeClipperPlugin {
                 var settings = new {
                     Presets = _presets,
                     Current = CurrentPreset,
-                    Autostart = AutoStartCheckBox.Checked
+                    AppSettings = new AppSettings()
                 };
                 serializer.Serialize(fs, settings);
             }

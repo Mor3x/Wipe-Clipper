@@ -65,6 +65,7 @@ namespace WipeClipperPlugin {
             this.presetsComboBox = new System.Windows.Forms.ComboBox();
             this.newPresetName = new System.Windows.Forms.TextBox();
             this.savePresetButton = new System.Windows.Forms.Button();
+            this.includeTimePlotCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -334,6 +335,7 @@ namespace WipeClipperPlugin {
             this.AutoStartCheckBox.TabIndex = 14;
             this.AutoStartCheckBox.Text = "Auto start on ACT boot";
             this.AutoStartCheckBox.UseVisualStyleBackColor = true;
+            this.AutoStartCheckBox.CheckedChanged += new System.EventHandler(this.AutoStartCheckBox_CheckedChanged);
             // 
             // ChannelsListBox
             // 
@@ -392,7 +394,7 @@ namespace WipeClipperPlugin {
             // 
             // ResetPullsButton
             // 
-            this.ResetPullsButton.Location = new System.Drawing.Point(783, 91);
+            this.ResetPullsButton.Location = new System.Drawing.Point(783, 114);
             this.ResetPullsButton.Name = "ResetPullsButton";
             this.ResetPullsButton.Size = new System.Drawing.Size(100, 23);
             this.ResetPullsButton.TabIndex = 17;
@@ -454,10 +456,22 @@ namespace WipeClipperPlugin {
             this.savePresetButton.UseVisualStyleBackColor = true;
             this.savePresetButton.Click += new System.EventHandler(this.savePresetButton_Click);
             // 
+            // includeTimePlotCheckBox
+            // 
+            this.includeTimePlotCheckBox.AutoSize = true;
+            this.includeTimePlotCheckBox.Location = new System.Drawing.Point(783, 91);
+            this.includeTimePlotCheckBox.Name = "includeTimePlotCheckBox";
+            this.includeTimePlotCheckBox.Size = new System.Drawing.Size(103, 17);
+            this.includeTimePlotCheckBox.TabIndex = 28;
+            this.includeTimePlotCheckBox.Text = "Include time plot";
+            this.includeTimePlotCheckBox.UseVisualStyleBackColor = true;
+            this.includeTimePlotCheckBox.CheckedChanged += new System.EventHandler(this.includeTimePlotCheckBox_CheckedChanged);
+            // 
             // MainControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.includeTimePlotCheckBox);
             this.Controls.Add(this.savePresetButton);
             this.Controls.Add(this.newPresetName);
             this.Controls.Add(this.presetsComboBox);
@@ -529,5 +543,6 @@ namespace WipeClipperPlugin {
         private ComboBox presetsComboBox;
         private TextBox newPresetName;
         private Button savePresetButton;
+        private CheckBox includeTimePlotCheckBox;
     }
 }

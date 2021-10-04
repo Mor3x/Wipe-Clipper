@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class Preset {
         public string Name { get; set; }
         public Settings settings { get; set; }
