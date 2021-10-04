@@ -206,6 +206,10 @@ namespace WipeClipperPlugin {
         }
 
         private void deletePresetButton_Click(object sender, EventArgs e) {
+            if (presetsComboBox.SelectedItem is null) {
+                return;
+            }
+
             if (((Preset)presetsComboBox.SelectedItem).Name == CurrentPreset.Name) {
                 CurrentPreset.Name = "";
             }
