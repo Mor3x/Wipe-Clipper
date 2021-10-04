@@ -9,7 +9,6 @@ namespace WipeClipperUtils {
         public ulong ClipsChannel = 0;
         public ulong SummariesChannel = 0;
         public int GreenThreshold;
-        public bool AddTeaMarkers;
         public string Zone = "";
         public string ClipKeyword = "!clip";
 

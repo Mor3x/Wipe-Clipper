@@ -15,7 +15,6 @@ namespace WipeClipperUtils {
         public void LoadPreset(Preset otherPreset) {
             Name = otherPreset.Name;
             settings.AccessToken = otherPreset.settings.AccessToken;
-            settings.AddTeaMarkers = otherPreset.settings.AddTeaMarkers;
             settings.ClientId = otherPreset.settings.ClientId;
             settings.ClipsChannel = otherPreset.settings.ClipsChannel;
             settings.DiscordToken = otherPreset.settings.DiscordToken;
