@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace WipeClipperUtils {
     public class Preset {
@@ -26,6 +28,11 @@ namespace WipeClipperUtils {
             var channelsCopy = new List<string>();
             otherPreset.settings.Channels.ForEach(channel => channelsCopy.Add(channel));
             settings.Channels = channelsCopy;
+
+            var plotLinesCopy = new BindingList<PlotLine>();
+            otherPreset.settings.PlotLines.ToList().ForEach(line => plotLinesCopy.Add(line));
+            settings.PlotLines = plotLinesCopy;
+
         }
 
         public override string ToString() {

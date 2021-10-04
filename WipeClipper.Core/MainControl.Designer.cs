@@ -26,7 +26,6 @@ namespace WipeClipperPlugin {
         /// </summary>
         private void InitializeComponent() {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.TeaMechanicsCheckBox = new System.Windows.Forms.CheckBox();
             this.ManualClipKeywordTextBox = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.GetCurrentZoneButton = new System.Windows.Forms.Button();
@@ -66,12 +65,27 @@ namespace WipeClipperPlugin {
             this.newPresetName = new System.Windows.Forms.TextBox();
             this.savePresetButton = new System.Windows.Forms.Button();
             this.includeTimePlotCheckBox = new System.Windows.Forms.CheckBox();
+            this.plotLinesListBox = new System.Windows.Forms.ListBox();
+            this.plotLineNameTextBox = new System.Windows.Forms.TextBox();
+            this.plotLineTimeTextBox = new System.Windows.Forms.TextBox();
+            this.addPlotLineButton = new System.Windows.Forms.Button();
+            this.removePlotLineButton = new System.Windows.Forms.Button();
+            this.plotLinesLabel = new System.Windows.Forms.Label();
+            this.plotLinesNameLabel = new System.Windows.Forms.Label();
+            this.plotLinesTimeLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.TeaMechanicsCheckBox);
+            this.groupBox1.Controls.Add(this.plotLinesTimeLabel);
+            this.groupBox1.Controls.Add(this.plotLinesNameLabel);
+            this.groupBox1.Controls.Add(this.plotLinesLabel);
+            this.groupBox1.Controls.Add(this.removePlotLineButton);
+            this.groupBox1.Controls.Add(this.addPlotLineButton);
+            this.groupBox1.Controls.Add(this.plotLineTimeTextBox);
+            this.groupBox1.Controls.Add(this.plotLineNameTextBox);
+            this.groupBox1.Controls.Add(this.plotLinesListBox);
             this.groupBox1.Controls.Add(this.ManualClipKeywordTextBox);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.GetCurrentZoneButton);
@@ -83,7 +97,10 @@ namespace WipeClipperPlugin {
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.ClipsChannelTextBox);
+            this.groupBox1.Controls.Add(this.RemoveChannelButton);
+            this.groupBox1.Controls.Add(this.AddChannelButton);
             this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.ChannelTextBox);
             this.groupBox1.Controls.Add(this.AccessTokenTextBox);
             this.groupBox1.Controls.Add(this.DiscordTokenTextBox);
             this.groupBox1.Controls.Add(this.ClientIdTextBox);
@@ -96,20 +113,9 @@ namespace WipeClipperPlugin {
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Options";
             // 
-            // TeaMechanicsCheckBox
-            // 
-            this.TeaMechanicsCheckBox.AutoSize = true;
-            this.TeaMechanicsCheckBox.Location = new System.Drawing.Point(417, 228);
-            this.TeaMechanicsCheckBox.Name = "TeaMechanicsCheckBox";
-            this.TeaMechanicsCheckBox.Size = new System.Drawing.Size(155, 17);
-            this.TeaMechanicsCheckBox.TabIndex = 16;
-            this.TeaMechanicsCheckBox.Text = "Add TEA mechanics to plot";
-            this.TeaMechanicsCheckBox.UseVisualStyleBackColor = true;
-            this.TeaMechanicsCheckBox.CheckedChanged += new System.EventHandler(this.TeaMechanicsCheckBox_CheckedChanged);
-            // 
             // ManualClipKeywordTextBox
             // 
-            this.ManualClipKeywordTextBox.Location = new System.Drawing.Point(151, 148);
+            this.ManualClipKeywordTextBox.Location = new System.Drawing.Point(151, 143);
             this.ManualClipKeywordTextBox.Name = "ManualClipKeywordTextBox";
             this.ManualClipKeywordTextBox.Size = new System.Drawing.Size(164, 20);
             this.ManualClipKeywordTextBox.TabIndex = 6;
@@ -119,7 +125,7 @@ namespace WipeClipperPlugin {
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(7, 151);
+            this.label10.Location = new System.Drawing.Point(7, 146);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(102, 13);
             this.label10.TabIndex = 15;
@@ -127,7 +133,7 @@ namespace WipeClipperPlugin {
             // 
             // GetCurrentZoneButton
             // 
-            this.GetCurrentZoneButton.Location = new System.Drawing.Point(213, 224);
+            this.GetCurrentZoneButton.Location = new System.Drawing.Point(213, 221);
             this.GetCurrentZoneButton.Name = "GetCurrentZoneButton";
             this.GetCurrentZoneButton.Size = new System.Drawing.Size(102, 22);
             this.GetCurrentZoneButton.TabIndex = 9;
@@ -137,7 +143,7 @@ namespace WipeClipperPlugin {
             // 
             // GreenThresholdTextBox
             // 
-            this.GreenThresholdTextBox.Location = new System.Drawing.Point(212, 174);
+            this.GreenThresholdTextBox.Location = new System.Drawing.Point(212, 169);
             this.GreenThresholdTextBox.Name = "GreenThresholdTextBox";
             this.GreenThresholdTextBox.Size = new System.Drawing.Size(103, 20);
             this.GreenThresholdTextBox.TabIndex = 7;
@@ -145,7 +151,7 @@ namespace WipeClipperPlugin {
             // 
             // ZoneTextBox
             // 
-            this.ZoneTextBox.Location = new System.Drawing.Point(151, 200);
+            this.ZoneTextBox.Location = new System.Drawing.Point(151, 195);
             this.ZoneTextBox.Name = "ZoneTextBox";
             this.ZoneTextBox.Size = new System.Drawing.Size(164, 20);
             this.ZoneTextBox.TabIndex = 8;
@@ -154,7 +160,7 @@ namespace WipeClipperPlugin {
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 203);
+            this.label9.Location = new System.Drawing.Point(7, 198);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(105, 13);
             this.label9.TabIndex = 12;
@@ -163,7 +169,7 @@ namespace WipeClipperPlugin {
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(7, 122);
+            this.label7.Location = new System.Drawing.Point(7, 120);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(100, 13);
             this.label7.TabIndex = 11;
@@ -171,7 +177,7 @@ namespace WipeClipperPlugin {
             // 
             // SummariesChannelTextBox
             // 
-            this.SummariesChannelTextBox.Location = new System.Drawing.Point(151, 119);
+            this.SummariesChannelTextBox.Location = new System.Drawing.Point(151, 117);
             this.SummariesChannelTextBox.Name = "SummariesChannelTextBox";
             this.SummariesChannelTextBox.Size = new System.Drawing.Size(164, 20);
             this.SummariesChannelTextBox.TabIndex = 5;
@@ -180,7 +186,7 @@ namespace WipeClipperPlugin {
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 177);
+            this.label1.Location = new System.Drawing.Point(7, 172);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(187, 13);
             this.label1.TabIndex = 7;
@@ -189,7 +195,7 @@ namespace WipeClipperPlugin {
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 95);
+            this.label6.Location = new System.Drawing.Point(7, 94);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(71, 13);
             this.label6.TabIndex = 9;
@@ -197,7 +203,7 @@ namespace WipeClipperPlugin {
             // 
             // ClipsChannelTextBox
             // 
-            this.ClipsChannelTextBox.Location = new System.Drawing.Point(151, 92);
+            this.ClipsChannelTextBox.Location = new System.Drawing.Point(151, 91);
             this.ClipsChannelTextBox.Name = "ClipsChannelTextBox";
             this.ClipsChannelTextBox.Size = new System.Drawing.Size(164, 20);
             this.ClipsChannelTextBox.TabIndex = 4;
@@ -342,12 +348,12 @@ namespace WipeClipperPlugin {
             this.ChannelsListBox.FormattingEnabled = true;
             this.ChannelsListBox.Location = new System.Drawing.Point(339, 36);
             this.ChannelsListBox.Name = "ChannelsListBox";
-            this.ChannelsListBox.Size = new System.Drawing.Size(237, 82);
+            this.ChannelsListBox.Size = new System.Drawing.Size(237, 56);
             this.ChannelsListBox.TabIndex = 10;
             // 
             // ChannelTextBox
             // 
-            this.ChannelTextBox.Location = new System.Drawing.Point(339, 123);
+            this.ChannelTextBox.Location = new System.Drawing.Point(335, 91);
             this.ChannelTextBox.Name = "ChannelTextBox";
             this.ChannelTextBox.Size = new System.Drawing.Size(100, 20);
             this.ChannelTextBox.TabIndex = 11;
@@ -355,7 +361,7 @@ namespace WipeClipperPlugin {
             // 
             // AddChannelButton
             // 
-            this.AddChannelButton.Location = new System.Drawing.Point(445, 122);
+            this.AddChannelButton.Location = new System.Drawing.Point(441, 90);
             this.AddChannelButton.Name = "AddChannelButton";
             this.AddChannelButton.Size = new System.Drawing.Size(53, 22);
             this.AddChannelButton.TabIndex = 12;
@@ -365,7 +371,7 @@ namespace WipeClipperPlugin {
             // 
             // RemoveChannelButton
             // 
-            this.RemoveChannelButton.Location = new System.Drawing.Point(504, 122);
+            this.RemoveChannelButton.Location = new System.Drawing.Point(500, 90);
             this.RemoveChannelButton.Name = "RemoveChannelButton";
             this.RemoveChannelButton.Size = new System.Drawing.Size(72, 22);
             this.RemoveChannelButton.TabIndex = 13;
@@ -467,6 +473,78 @@ namespace WipeClipperPlugin {
             this.includeTimePlotCheckBox.UseVisualStyleBackColor = true;
             this.includeTimePlotCheckBox.CheckedChanged += new System.EventHandler(this.includeTimePlotCheckBox_CheckedChanged);
             // 
+            // plotLinesListBox
+            // 
+            this.plotLinesListBox.FormattingEnabled = true;
+            this.plotLinesListBox.Location = new System.Drawing.Point(335, 134);
+            this.plotLinesListBox.Name = "plotLinesListBox";
+            this.plotLinesListBox.Size = new System.Drawing.Size(237, 69);
+            this.plotLinesListBox.TabIndex = 16;
+            // 
+            // plotLineNameTextBox
+            // 
+            this.plotLineNameTextBox.Location = new System.Drawing.Point(335, 225);
+            this.plotLineNameTextBox.Name = "plotLineNameTextBox";
+            this.plotLineNameTextBox.Size = new System.Drawing.Size(68, 20);
+            this.plotLineNameTextBox.TabIndex = 17;
+            // 
+            // plotLineTimeTextBox
+            // 
+            this.plotLineTimeTextBox.Location = new System.Drawing.Point(409, 225);
+            this.plotLineTimeTextBox.Name = "plotLineTimeTextBox";
+            this.plotLineTimeTextBox.Size = new System.Drawing.Size(41, 20);
+            this.plotLineTimeTextBox.TabIndex = 18;
+            // 
+            // addPlotLineButton
+            // 
+            this.addPlotLineButton.Location = new System.Drawing.Point(456, 224);
+            this.addPlotLineButton.Name = "addPlotLineButton";
+            this.addPlotLineButton.Size = new System.Drawing.Size(48, 22);
+            this.addPlotLineButton.TabIndex = 19;
+            this.addPlotLineButton.Text = "Add";
+            this.addPlotLineButton.UseVisualStyleBackColor = true;
+            this.addPlotLineButton.Click += new System.EventHandler(this.addPlotLineButton_Click);
+            // 
+            // removePlotLineButton
+            // 
+            this.removePlotLineButton.Location = new System.Drawing.Point(510, 224);
+            this.removePlotLineButton.Name = "removePlotLineButton";
+            this.removePlotLineButton.Size = new System.Drawing.Size(62, 22);
+            this.removePlotLineButton.TabIndex = 20;
+            this.removePlotLineButton.Text = "Remove";
+            this.removePlotLineButton.UseVisualStyleBackColor = true;
+            this.removePlotLineButton.Click += new System.EventHandler(this.removePlotLineButton_Click);
+            // 
+            // plotLinesLabel
+            // 
+            this.plotLinesLabel.AutoSize = true;
+            this.plotLinesLabel.BackColor = System.Drawing.Color.Transparent;
+            this.plotLinesLabel.Location = new System.Drawing.Point(335, 117);
+            this.plotLinesLabel.Name = "plotLinesLabel";
+            this.plotLinesLabel.Size = new System.Drawing.Size(53, 13);
+            this.plotLinesLabel.TabIndex = 21;
+            this.plotLinesLabel.Text = "Plot Lines";
+            // 
+            // plotLinesNameLabel
+            // 
+            this.plotLinesNameLabel.AutoSize = true;
+            this.plotLinesNameLabel.BackColor = System.Drawing.Color.Transparent;
+            this.plotLinesNameLabel.Location = new System.Drawing.Point(335, 208);
+            this.plotLinesNameLabel.Name = "plotLinesNameLabel";
+            this.plotLinesNameLabel.Size = new System.Drawing.Size(35, 13);
+            this.plotLinesNameLabel.TabIndex = 22;
+            this.plotLinesNameLabel.Text = "Name";
+            // 
+            // plotLinesTimeLabel
+            // 
+            this.plotLinesTimeLabel.AutoSize = true;
+            this.plotLinesTimeLabel.BackColor = System.Drawing.Color.Transparent;
+            this.plotLinesTimeLabel.Location = new System.Drawing.Point(406, 208);
+            this.plotLinesTimeLabel.Name = "plotLinesTimeLabel";
+            this.plotLinesTimeLabel.Size = new System.Drawing.Size(30, 13);
+            this.plotLinesTimeLabel.TabIndex = 23;
+            this.plotLinesTimeLabel.Text = "Time";
+            // 
             // MainControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -481,9 +559,6 @@ namespace WipeClipperPlugin {
             this.Controls.Add(this.ResetPullsButton);
             this.Controls.Add(this.StatusLabel);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.RemoveChannelButton);
-            this.Controls.Add(this.AddChannelButton);
-            this.Controls.Add(this.ChannelTextBox);
             this.Controls.Add(this.ChannelsListBox);
             this.Controls.Add(this.AutoStartCheckBox);
             this.Controls.Add(this.AddBreakButton);
@@ -536,7 +611,6 @@ namespace WipeClipperPlugin {
         private TextBox ManualClipKeywordTextBox;
         private Label label10;
         private Button ResetPullsButton;
-        private CheckBox TeaMechanicsCheckBox;
         private Label presetsLabel;
         private Button loadPresetButton;
         private Button deletePresetButton;
@@ -544,5 +618,13 @@ namespace WipeClipperPlugin {
         private TextBox newPresetName;
         private Button savePresetButton;
         private CheckBox includeTimePlotCheckBox;
+        private ListBox plotLinesListBox;
+        private Label plotLinesTimeLabel;
+        private Label plotLinesNameLabel;
+        private Label plotLinesLabel;
+        private Button removePlotLineButton;
+        private Button addPlotLineButton;
+        private TextBox plotLineTimeTextBox;
+        private TextBox plotLineNameTextBox;
     }
 }

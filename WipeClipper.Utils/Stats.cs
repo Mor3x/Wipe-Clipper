@@ -9,15 +9,6 @@ using OxyPlot.WindowsForms;
 
 namespace WipeClipperUtils {
     public class Stats {
-        private static readonly Dictionary<string, int> _teaMechTimes = new Dictionary<string, int> {
-            {"Dolls End", 80},
-            {"P2", 165},
-            {"Gavel", 300},
-            {"P3", 380},
-            {"Inception", 410},
-            {"Wormhole", 505}
-        };
-
         private static Preset _preset;
 
         public static void CreatePlots(List<int> pulls, List<double> breaks, List<int> timeBetweenPulls, Preset preset, bool includeTimePlot) {
@@ -110,21 +101,19 @@ namespace WipeClipperUtils {
 
                 model.Annotations.Add(line);
             }
-
-            if (_preset.settings.AddTeaMarkers) {
-                foreach (var mech in _teaMechTimes) {
-                    var line = new LineAnnotation {
-                        StrokeThickness = 1,
-                        Color = OxyColors.Red,
-                        Type = LineAnnotationType.Horizontal,
-                        Text = mech.Key,
-                        TextColor = OxyColors.Black,
-                        Y = mech.Value,
-                        TextLinePosition = 0,
-                        TextHorizontalAlignment = HorizontalAlignment.Left
-                    };
-                    model.Annotations.Add(line);
-                }
+            
+            foreach (var plotLine in _preset.settings.PlotLines) {
+                var line = new LineAnnotation {
+                    StrokeThickness = 1,
+                    Color = OxyColors.Red,
+                    Type = LineAnnotationType.Horizontal,
+                    Text = plotLine.name,
+                    TextColor = OxyColors.Black,
+                    Y = plotLine.time,
+                    TextLinePosition = 0,
+                    TextHorizontalAlignment = HorizontalAlignment.Left
+                };
+                model.Annotations.Add(line);
             }
 
             var thresholdLine = new LineAnnotation {
@@ -207,20 +196,18 @@ namespace WipeClipperUtils {
                 }
             }
 
-            if (_preset.settings.AddTeaMarkers) {
-                foreach (var mech in _teaMechTimes) {
-                    var line = new LineAnnotation {
-                        StrokeThickness = 1,
-                        Color = OxyColors.Red,
-                        Type = LineAnnotationType.Horizontal,
-                        Text = mech.Key,
-                        TextColor = OxyColors.Black,
-                        Y = mech.Value,
-                        TextLinePosition = 0,
-                        TextHorizontalAlignment = HorizontalAlignment.Left
-                    };
-                    model.Annotations.Add(line);
-                }
+            foreach (var plotLine in _preset.settings.PlotLines) {
+                var line = new LineAnnotation {
+                    StrokeThickness = 1,
+                    Color = OxyColors.Red,
+                    Type = LineAnnotationType.Horizontal,
+                    Text = plotLine.name,
+                    TextColor = OxyColors.Black,
+                    Y = plotLine.time,
+                    TextLinePosition = 0,
+                    TextHorizontalAlignment = HorizontalAlignment.Left
+                };
+                model.Annotations.Add(line);
             }
 
             var thresholdLine = new LineAnnotation {

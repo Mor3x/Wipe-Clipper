@@ -29,6 +29,7 @@ namespace WipeClipperPlugin {
             Logger.Log += Log;
 
             presetsComboBox.DataSource = _presets;
+            plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
             LoadSettings();
 
             MainLogic.OnStatusLabelChanged += HandleStatusChanged;
@@ -190,10 +191,6 @@ namespace WipeClipperPlugin {
             MainLogic.ResetPulls();
         }
 
-        private void TeaMechanicsCheckBox_CheckedChanged(object sender, EventArgs e) {
-            CurrentPreset.settings.AddTeaMarkers = TeaMechanicsCheckBox.Checked;
-        }
-
         private void loadPresetButton_Click(object sender, EventArgs e) {
             Logger.Debug($"Loading preset {((Preset)presetsComboBox.SelectedItem).Name}.");
             CurrentPreset.LoadPreset((Preset)presetsComboBox.SelectedItem);
@@ -242,6 +239,34 @@ namespace WipeClipperPlugin {
             AppSettings.AutoStart = AutoStartCheckBox.Checked;
         }
 
+        private void addPlotLineButton_Click(object sender, EventArgs e) {
+            if (string.IsNullOrEmpty(plotLineNameTextBox.Text) || string.IsNullOrEmpty(plotLineTimeTextBox.Text)) {
+                return;
+            }
+
+
+            if (int.TryParse(plotLineTimeTextBox.Text, out var result)) {
+                if (CurrentPreset.settings.PlotLines.Count(x => x.name == plotLineNameTextBox.Text || x.time == result) > 0) {
+                    return;
+                }
+
+                CurrentPreset.settings.PlotLines.Add(new PlotLine { name = plotLineNameTextBox.Text, time = result });
+                CurrentPreset.settings.PlotLines = new BindingList<PlotLine>(CurrentPreset.settings.PlotLines.OrderBy(x => x.time).ToList());
+                plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
+
+                plotLineNameTextBox.Text = "";
+                plotLineTimeTextBox.Text = "";
+                Logger.Debug("Added new plot line.");
+            }
+        }
+
+        private void removePlotLineButton_Click(object sender, EventArgs e) {
+            if (plotLinesListBox.SelectedItem != null) {
+                CurrentPreset.settings.PlotLines.Remove((PlotLine)plotLinesListBox.SelectedItem);
+                Logger.Debug("Removed plot line.");
+            }
+        }
+
         #region Settings
 
         private void LoadSettings() {
@@ -254,11 +279,11 @@ namespace WipeClipperPlugin {
                             Current = CurrentPreset,
                             AppSettings = new AppSettings()
                         };
-                        Logger.Debug(fileContent);
                         var deserialized = JsonConvert.DeserializeAnonymousType(fileContent, definition);
 
                         _presets = deserialized.Presets;
                         presetsComboBox.DataSource = _presets;
+                        plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
                         CurrentPreset = deserialized.Current;
 
                         AutoStartCheckBox.Checked = AppSettings.AutoStart;
@@ -296,10 +321,10 @@ namespace WipeClipperPlugin {
             GreenThresholdTextBox.Text = CurrentPreset.settings.GreenThreshold.ToString();
             ChannelsListBox.Items.Clear();
             CurrentPreset.settings.Channels.ForEach(x => ChannelsListBox.Items.Add(x));
-            TeaMechanicsCheckBox.Checked = CurrentPreset.settings.AddTeaMarkers;
             ZoneTextBox.Text = CurrentPreset.settings.Zone;
             ManualClipKeywordTextBox.Text = CurrentPreset.settings.ClipKeyword;
             newPresetName.Text = CurrentPreset.Name;
+            plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
         }
 
         #endregion
