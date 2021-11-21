@@ -31,7 +31,7 @@ For the setup guide please refer to the [wiki.](https://github.com/Mor3x/Wipe-Cl
 - No entry for "Allowed zone" means the plugin will work during any raid.
 - If you have 2 sessions of raids without an ACT restart in between, you need to click Reset Pulls, otherwise 
 the pulls from the last session will still count towards the pull number and on the summary.
-- Currently only english, german and french game languages are supported.
+- Currently only English, German, French and Japanese game languages are supported.
 
 ## Questions and feature suggestions
 If you have any questions, bug reports and/or feature requests, please submit them [here](https://github.com/Mor3x/Wipe-Clipper/issues),
