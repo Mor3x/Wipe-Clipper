@@ -3,37 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Advanced_Combat_Tracker;
-using DiscordAndTwitch;
+using WipeClipper.Core;
+using WipeClipperUtils;
 
 namespace WipeClipperPlugin {
-    class MainLogic {
+    internal class MainLogic {
+        public delegate void LabelChangedEventHandler(object sender, StatusChangedEventArgs args);
+
         private static bool _isStarted;
-        private static int _wipes = 0;
+        private static int _wipes;
         private static TimeSpan _pullTime;
+        private static TimeSpan _wipeTime = TimeSpan.MinValue;
         private static bool _isPulled;
         private static readonly List<int> _pullTimes = new List<int>();
+        private static readonly List<int> _timeBetweenPulls = new List<int>();
         private static readonly List<double> _breaks = new List<double>();
-
-        public delegate void LabelChangedEventHandler(object sender, StatusChangedEventArgs args);
         public static event LabelChangedEventHandler OnStatusLabelChanged;
 
-        public static async Task Setup() {
-            while (string.IsNullOrWhiteSpace(Settings.AccessToken) || string.IsNullOrWhiteSpace(Settings.ClientId)
-                || string.IsNullOrWhiteSpace(Settings.DiscordToken)) {
+        private static Preset _preset;
+
+        public static async Task Setup(Preset preset) {
+            _preset = preset;
+            while (string.IsNullOrWhiteSpace(_preset.settings.AccessToken) || string.IsNullOrWhiteSpace(_preset.settings.ClientId)
+                || string.IsNullOrWhiteSpace(_preset.settings.DiscordToken)) {
                 Logger.Error("Please provide the Client ID, Access Token and the Discord Token and start again.");
                 return;
             }
 
-            await Task.Factory.StartNew(TwitchApiHandler.Setup);
+            await Task.Factory.StartNew(() => TwitchApiHandler.Setup(_preset));
 
-            foreach (var streamName in Settings.Channels) {
+            foreach (var streamName in _preset.settings.Channels) {
                 var id = await TwitchApiHandler.GetUserIdByName(streamName);
                 if (!Settings.UserIDs.ContainsKey(streamName)) {
                     Settings.UserIDs.Add(streamName, id);
                 }
             }
 
-            await Task.Factory.StartNew(() => Discord.SetupBot(Settings.ClipsChannel, Settings.SummariesChannel));
+            await Task.Factory.StartNew(() => Discord.SetupBot(_preset.settings.ClipsChannel, _preset.settings.SummariesChannel, _preset));
 
             ActGlobals.oFormActMain.OnLogLineRead += OnLogLineRead;
             MainControl.OnPostSummary += HandlePostSummary;
@@ -63,14 +69,18 @@ namespace WipeClipperPlugin {
         public static void HandlePulled() {
             _pullTime = DateTime.Now.TimeOfDay;
             _isPulled = true;
+            if (_wipeTime != TimeSpan.MinValue) {
+                _timeBetweenPulls.Add((int) (DateTime.Now.TimeOfDay - _wipeTime).TotalSeconds);
+            }
         }
 
         public static async void HandleWiped() {
             if (_isPulled) {
                 Logger.Debug("Clipping and sending message.");
                 _isPulled = false;
+                _wipeTime = DateTime.Now.TimeOfDay;
                 var clips = await TwitchApiHandler.MakeClip(Settings.UserIDs);
-                string message = "";
+                var message = "";
 
                 foreach (var userIdPair in Settings.UserIDs) {
                     try {
@@ -83,8 +93,8 @@ namespace WipeClipperPlugin {
 
                 var totalPullTime = DateTime.Now.TimeOfDay - _pullTime;
 
-                var isGreen = totalPullTime.TotalSeconds > Settings.GreenThreshold;
-                _pullTimes.Add((int)totalPullTime.TotalSeconds);
+                var isGreen = totalPullTime.TotalSeconds > _preset.settings.GreenThreshold;
+                _pullTimes.Add((int) totalPullTime.TotalSeconds);
 
                 await Discord.SendMessage(message + "\n", $"Wipe #{++_wipes} - {totalPullTime:mm\\:ss}min", isGreen);
             }
@@ -94,7 +104,7 @@ namespace WipeClipperPlugin {
             Logger.Debug("Creating clip manually.");
 
             var clips = await TwitchApiHandler.MakeClip(Settings.UserIDs);
-            string message = "";
+            var message = "";
 
             foreach (var userIdPair in Settings.UserIDs) {
                 try {
@@ -115,29 +125,30 @@ namespace WipeClipperPlugin {
             }
 
             Logger.Debug("Posting summary.");
-            Stats.SavePlot(_pullTimes, _breaks);
-            var result = Stats.GetStats(_pullTimes);
-            await Discord.SendSummary(result);
+            Stats.CreatePlots(_pullTimes, _breaks, _timeBetweenPulls, _preset, AppSettings.IncludeTimePlot);
+            var result = Stats.GetStats(_pullTimes, _timeBetweenPulls);
+            await Discord.SendSummary(result, AppSettings.IncludeTimePlot);
         }
 
         public static async void HandleChannelsChanged(object o, EventArgs e) {
-            foreach (var streamName in Settings.Channels.Where(streamName => !Settings.UserIDs.ContainsKey(streamName))) {
+            foreach (var streamName in _preset.settings.Channels.Where(streamName => !Settings.UserIDs.ContainsKey(streamName))) {
                 var id = await TwitchApiHandler.GetUserIdByName(streamName);
                 if (id is null) {
                     Logger.Error($"Channel {streamName} either does not exist or there has been an error with the API call. Please check the spelling and try again.");
                     return;
                 }
+
                 Settings.UserIDs.Add(streamName, id);
                 Logger.Debug($"Adding {streamName}:{id} to channels list.");
             }
 
-            var removedStreamNames = Settings.UserIDs.Keys.Where(streamName => !Settings.Channels.Contains(streamName)).ToList();
+            var removedStreamNames = Settings.UserIDs.Keys.Where(streamName => !_preset.settings.Channels.Contains(streamName)).ToList();
             foreach (var streamName in removedStreamNames) {
                 Settings.UserIDs.Remove(streamName);
                 Logger.Debug($"Removing {streamName} from channels list.");
             }
         }
-        
+
         public static async void HandleDiscordChannelsChanged(object o, EventArgs e) {
             await Discord.UpdateChannels();
         }
@@ -148,7 +159,9 @@ namespace WipeClipperPlugin {
         }
 
         public static void Stop() {
-            if (!_isStarted) return;
+            if (!_isStarted) {
+                return;
+            }
 
             Logger.Debug("Stopping.");
             Discord.Disconnect();
@@ -163,10 +176,10 @@ namespace WipeClipperPlugin {
 
         public static void ChangeStatusLabel(bool working) {
             if (working) {
-                LabelChangedEventHandler handler = OnStatusLabelChanged;
+                var handler = OnStatusLabelChanged;
                 handler?.Invoke(null, new StatusChangedEventArgs(true));
             } else {
-                LabelChangedEventHandler handler = OnStatusLabelChanged;
+                var handler = OnStatusLabelChanged;
                 handler?.Invoke(null, new StatusChangedEventArgs(false));
             }
         }
@@ -181,6 +194,7 @@ namespace WipeClipperPlugin {
             _pullTimes.Clear();
             _breaks.Clear();
             _wipes = 0;
+            _timeBetweenPulls.Clear();
         }
     }
 }

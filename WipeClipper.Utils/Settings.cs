@@ -1,15 +1,26 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public class Settings {
-        public static string ClientId;
-        public static string AccessToken;
-        public static string DiscordToken;
-        public static ulong ClipsChannel = 0;
-        public static ulong SummariesChannel = 0;
-        public static int GreenThreshold;
+        public string ClientId;
+        public string AccessToken;
+        public string DiscordToken;
+        public ulong ClipsChannel = 0;
+        public ulong SummariesChannel = 0;
+        public int GreenThreshold;
+        public string Zone = "";
+        public string ClipKeyword = "!clip";
 
-        public static List<string> Channels = new List<string>();
+        public BindingList<PlotLine> PlotLines = new BindingList<PlotLine>();
+        public List<string> Channels = new List<string>();
         public static Dictionary<string, string> UserIDs = new Dictionary<string, string>();
+    }
+
+    public struct PlotLine {
+        public string name;
+        public int time;
+
+        public override string ToString() => $"{name}: {time}";
     }
 }

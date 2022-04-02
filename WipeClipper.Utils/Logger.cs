@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DiscordAndTwitch {
+namespace WipeClipperUtils {
     public static class Logger {
         public delegate void Message(string message);
         public static Message Log;

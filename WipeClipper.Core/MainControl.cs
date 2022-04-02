@@ -1,20 +1,20 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
-using System.Xml;
 using Advanced_Combat_Tracker;
-using DiscordAndTwitch;
+using Newtonsoft.Json;
+using WipeClipper.Core;
+using WipeClipperUtils;
 
 namespace WipeClipperPlugin {
     public partial class MainControl : UserControl, IActPluginV1 {
-        public static event EventHandler OnPostSummary;
-        public static event EventHandler OnChannelsChanged;
-        public static event EventHandler OnDiscordChannelsChanged;
+        private static BindingList<Preset> _presets = new BindingList<Preset>();
+        private static Preset CurrentPreset = new Preset("");
 
-        readonly string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\WipeClipper.config.xml");
-        SettingsSerializer xmlSettings;
+        private readonly string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\WipeClipper.config.json");
         private bool _isStarted;
 
         public MainControl() {
@@ -26,17 +26,18 @@ namespace WipeClipperPlugin {
             pluginStatusText.Text = "Ready.";
             pluginScreenSpace.Text = "Wipe Clipper";
             Dock = DockStyle.Fill;
+            Logger.Log += Log;
 
-            xmlSettings = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
+            presetsComboBox.DataSource = _presets;
+            plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
             LoadSettings();
 
-            Logger.Log += Log;
             MainLogic.OnStatusLabelChanged += HandleStatusChanged;
             Logger.Debug("Loaded.");
 
             if (AutoStartCheckBox.Checked) {
                 Logger.Debug("Starting on boot.");
-                MainLogic.Setup().ConfigureAwait(false);
+                MainLogic.Setup(CurrentPreset).ConfigureAwait(false);
             }
         }
 
@@ -44,59 +45,12 @@ namespace WipeClipperPlugin {
             SaveSettings();
             MainLogic.Deinit();
             Settings.UserIDs.Clear();
-            Settings.Channels.Clear();
+            CurrentPreset.settings.Channels.Clear();
         }
 
-        #region Settings
-        void LoadSettings() {
-            xmlSettings.AddControlSetting(AccessTokenTextBox.Name, AccessTokenTextBox);
-            xmlSettings.AddControlSetting(DiscordTokenTextBox.Name, DiscordTokenTextBox);
-            xmlSettings.AddControlSetting(ClientIdTextBox.Name, ClientIdTextBox);
-            xmlSettings.AddControlSetting(ClipsChannelTextBox.Name, ClipsChannelTextBox);
-            xmlSettings.AddControlSetting(SummariesChannelTextBox.Name, SummariesChannelTextBox);
-            xmlSettings.AddControlSetting(ChannelsListBox.Name, ChannelsListBox);
-            xmlSettings.AddControlSetting(GreenThresholdTextBox.Name, GreenThresholdTextBox);
-            xmlSettings.AddControlSetting(AutoStartCheckBox.Name, AutoStartCheckBox);
-            xmlSettings.AddControlSetting(ZoneTextBox.Name, ZoneTextBox);
-            xmlSettings.AddControlSetting(ManualClipKeywordTextBox.Name, ManualClipKeywordTextBox);
-
-            if (File.Exists(settingsFile)) {
-                using (var fs = new FileStream(settingsFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var xReader = new XmlTextReader(fs)) {
-                    try {
-                        while (xReader.Read()) {
-                            if (xReader.NodeType == XmlNodeType.Element) {
-                                if (xReader.LocalName == "SettingsSerializer") {
-                                    xmlSettings.ImportFromXml(xReader);
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        Logger.Error("Error loading settings.", e);
-                    }
-                }
-            }
-
-            if (ChannelsListBox.Items.Count != 0) {
-                foreach (string channelName in ChannelsListBox.Items) {
-                    Settings.Channels.Add(channelName);
-                }
-            }
-        }
-
-        void SaveSettings() {
-            using (var fs = new FileStream(settingsFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
-            using (var xWriter = new XmlTextWriter(fs, Encoding.UTF8) { Formatting = Formatting.Indented, Indentation = 1, IndentChar = '\t' }) {
-                xWriter.WriteStartDocument(true);
-                xWriter.WriteStartElement("Config"); // <Config>
-                xWriter.WriteStartElement("SettingsSerializer"); // <Config><SettingsSerializer>
-                xmlSettings.ExportToXml(xWriter); // Fill the SettingsSerializer XML
-                xWriter.WriteEndElement(); // </SettingsSerializer>
-                xWriter.WriteEndElement(); // </Config>
-                xWriter.WriteEndDocument(); // Tie up loose ends (shouldn't be any)
-            }
-        }
-        #endregion
+        public static event EventHandler OnPostSummary;
+        public static event EventHandler OnChannelsChanged;
+        public static event EventHandler OnDiscordChannelsChanged;
 
         public void Log(string text) {
             var row = new string[2];
@@ -119,53 +73,53 @@ namespace WipeClipperPlugin {
         }
 
         private void ClientIdTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.ClientId = ClientIdTextBox.Text;
+            CurrentPreset.settings.ClientId = ClientIdTextBox.Text;
         }
 
         private void AccessTokenTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.AccessToken = AccessTokenTextBox.Text;
+            CurrentPreset.settings.AccessToken = AccessTokenTextBox.Text;
         }
 
         private void DiscordTokenTextBox_TextChanged(object sender, EventArgs e) {
-            Settings.DiscordToken = DiscordTokenTextBox.Text;
+            CurrentPreset.settings.DiscordToken = DiscordTokenTextBox.Text;
         }
 
         private void ClipsChannelTextBox_TextChanged(object sender, EventArgs e) {
             if (ulong.TryParse(ClipsChannelTextBox.Text.Trim(), out var result)) {
-                Settings.ClipsChannel = result;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                CurrentPreset.settings.ClipsChannel = result;
+                var handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             } else if (string.IsNullOrWhiteSpace(ClipsChannelTextBox.Text)) {
-                Settings.ClipsChannel = 0;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                CurrentPreset.settings.ClipsChannel = 0;
+                var handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void SummariesChannelTextBox_TextChanged(object sender, EventArgs e) {
             if (ulong.TryParse(SummariesChannelTextBox.Text.Trim(), out var result)) {
-                Settings.SummariesChannel = result;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                CurrentPreset.settings.SummariesChannel = result;
+                var handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             } else if (string.IsNullOrWhiteSpace(SummariesChannelTextBox.Text)) {
-                Settings.SummariesChannel = 0;
-                EventHandler handler = OnDiscordChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                CurrentPreset.settings.SummariesChannel = 0;
+                var handler = OnDiscordChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void StartStopButton_Click(object sender, EventArgs e) {
             if (!_isStarted) {
                 Logger.Debug("Started");
-                MainLogic.Setup().ConfigureAwait(false);
+                MainLogic.Setup(CurrentPreset).ConfigureAwait(false);
             } else {
                 MainLogic.Stop();
             }
         }
 
         private void PostSummaryButton_Click(object sender, EventArgs e) {
-            EventHandler handler = OnPostSummary;
-            handler?.Invoke(this, new EventArgs());
+            var handler = OnPostSummary;
+            handler?.Invoke(this, EventArgs.Empty);
         }
 
         private void AddBreakButton_Click(object sender, EventArgs e) {
@@ -174,7 +128,7 @@ namespace WipeClipperPlugin {
 
         private void GreenThresholdTextBox_TextChanged(object sender, EventArgs e) {
             if (int.TryParse(GreenThresholdTextBox.Text, out var result)) {
-                Settings.GreenThreshold = result;
+                CurrentPreset.settings.GreenThreshold = result;
                 Logger.Debug($"Updating green color threshold to {result} seconds.");
             }
         }
@@ -185,28 +139,31 @@ namespace WipeClipperPlugin {
                 Logger.Debug($"Adding channel {channelName} to channels list.");
                 ChannelsListBox.Items.Add(channelName);
                 ChannelTextBox.Text = "";
-                Settings.Channels.Add(channelName);
-                EventHandler handler = OnChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+                CurrentPreset.settings.Channels.Add(channelName);
+                var handler = OnChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void RemoveChannelButton_Click(object sender, EventArgs e) {
             if (ChannelsListBox.SelectedItem != null) {
-                if (!(ChannelsListBox.SelectedItem is string selectedChannel)) return;
+                if (!(ChannelsListBox.SelectedItem is string selectedChannel)) {
+                    return;
+                }
 
                 ChannelsListBox.Items.Remove(selectedChannel);
-                if (Settings.Channels.Contains(selectedChannel)) {
-                    Settings.Channels.Remove(selectedChannel);
+                if (CurrentPreset.settings.Channels.Contains(selectedChannel)) {
+                    CurrentPreset.settings.Channels.Remove(selectedChannel);
                 }
-                EventHandler handler = OnChannelsChanged;
-                handler?.Invoke(this, new EventArgs());
+
+                var handler = OnChannelsChanged;
+                handler?.Invoke(this, EventArgs.Empty);
             }
         }
 
         private void ChannelTextBox_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Enter) {
-                AddChannelButton_Click(sender, new EventArgs());
+                AddChannelButton_Click(sender, EventArgs.Empty);
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
@@ -217,19 +174,163 @@ namespace WipeClipperPlugin {
         }
 
         private void ZoneTextBox_TextChanged(object sender, EventArgs e) {
+            CurrentPreset.settings.Zone = ZoneTextBox.Text;
             Regex.ChangeZone(ZoneTextBox.Text);
             var zoneName = string.IsNullOrWhiteSpace(ZoneTextBox.Text) ? "any" : ZoneTextBox.Text;
             Logger.Debug($"Updated zone to {zoneName}.");
         }
 
         private void ManualClipKeywordTextBox_TextChanged(object sender, EventArgs e) {
+            CurrentPreset.settings.ClipKeyword = ManualClipKeywordTextBox.Text;
             Regex.ChangeManualClipKeyword(ManualClipKeywordTextBox.Text);
-            var clipKeyword = string.IsNullOrWhiteSpace(ManualClipKeywordTextBox.Text) ? "any" : ManualClipKeywordTextBox.Text;
+            var clipKeyword = string.IsNullOrWhiteSpace(ManualClipKeywordTextBox.Text) ? "nothing" : ManualClipKeywordTextBox.Text;
             Logger.Debug($"Updated manual keyword to {clipKeyword}.");
         }
 
         private void ResetPullsButton_Click(object sender, EventArgs e) {
             MainLogic.ResetPulls();
         }
+
+        private void loadPresetButton_Click(object sender, EventArgs e) {
+            Logger.Debug($"Loading preset {((Preset)presetsComboBox.SelectedItem).Name}.");
+            CurrentPreset.LoadPreset((Preset)presetsComboBox.SelectedItem);
+
+            LoadFromCurrentPreset();
+
+            Logger.Debug("Preset loaded!");
+            if (_isStarted) {
+                Logger.Debug("Restarting the bot...");
+                MainLogic.Stop();
+                MainLogic.Setup(CurrentPreset).ConfigureAwait(false);
+            }
+        }
+
+        private void deletePresetButton_Click(object sender, EventArgs e) {
+            if (presetsComboBox.SelectedItem is null) {
+                return;
+            }
+
+            if (((Preset)presetsComboBox.SelectedItem).Name == CurrentPreset.Name) {
+                CurrentPreset.Name = "";
+            }
+
+            var preset = _presets.ToList().Find(item => item.Name.ToLower() == ((Preset)presetsComboBox.SelectedItem).Name.ToLower());
+            _presets.Remove(preset);
+            Logger.Debug("Removed preset!");
+        }
+
+        private void savePresetButton_Click(object sender, EventArgs e) {
+            CurrentPreset.Name = newPresetName.Text;
+            if (_presets.Count(x => x.Name == CurrentPreset.Name) > 0) {
+                var preset = _presets.ToList().Find(item => item.Name.ToLower() == newPresetName.Text.ToLower());
+                preset.LoadPreset(CurrentPreset);
+                presetsComboBox.SelectedItem = preset;
+            } else {
+                var newPreset = new Preset("");
+                newPreset.LoadPreset(CurrentPreset);
+                _presets.Add(newPreset);
+                presetsComboBox.SelectedItem = newPreset;
+            }
+
+            Logger.Debug($"Saved preset {newPresetName.Text}!");
+        }
+
+        private void includeTimePlotCheckBox_CheckedChanged(object sender, EventArgs e) {
+            AppSettings.IncludeTimePlot = includeTimePlotCheckBox.Checked;
+        }
+
+        private void AutoStartCheckBox_CheckedChanged(object sender, EventArgs e) {
+            AppSettings.AutoStart = AutoStartCheckBox.Checked;
+        }
+
+        private void addPlotLineButton_Click(object sender, EventArgs e) {
+            if (string.IsNullOrEmpty(plotLineNameTextBox.Text) || string.IsNullOrEmpty(plotLineTimeTextBox.Text)) {
+                return;
+            }
+
+
+            if (int.TryParse(plotLineTimeTextBox.Text, out var result)) {
+                if (CurrentPreset.settings.PlotLines.Count(x => x.name == plotLineNameTextBox.Text || x.time == result) > 0) {
+                    return;
+                }
+
+                CurrentPreset.settings.PlotLines.Add(new PlotLine { name = plotLineNameTextBox.Text, time = result });
+                CurrentPreset.settings.PlotLines = new BindingList<PlotLine>(CurrentPreset.settings.PlotLines.OrderBy(x => x.time).ToList());
+                plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
+
+                plotLineNameTextBox.Text = "";
+                plotLineTimeTextBox.Text = "";
+                Logger.Debug("Added new plot line.");
+            }
+        }
+
+        private void removePlotLineButton_Click(object sender, EventArgs e) {
+            if (plotLinesListBox.SelectedItem != null) {
+                CurrentPreset.settings.PlotLines.Remove((PlotLine)plotLinesListBox.SelectedItem);
+                Logger.Debug("Removed plot line.");
+            }
+        }
+
+        #region Settings
+
+        private void LoadSettings() {
+            if (File.Exists(settingsFile)) {
+                using (var fs = File.OpenText(settingsFile)) {
+                    try {
+                        var fileContent = fs.ReadToEnd();
+                        var definition = new {
+                            Presets = _presets,
+                            Current = CurrentPreset,
+                            AppSettings = new AppSettings()
+                        };
+                        var deserialized = JsonConvert.DeserializeAnonymousType(fileContent, definition);
+
+                        _presets = deserialized.Presets;
+                        presetsComboBox.DataSource = _presets;
+                        plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
+                        CurrentPreset = deserialized.Current;
+
+                        AutoStartCheckBox.Checked = AppSettings.AutoStart;
+                        includeTimePlotCheckBox.Checked = AppSettings.IncludeTimePlot;
+
+                        presetsComboBox.SelectedItem = _presets.ToList().Find(item => item.Name.ToLower() == CurrentPreset.Name.ToLower());
+                        newPresetName.Text = CurrentPreset.Name;
+
+                        LoadFromCurrentPreset();
+                    } catch (Exception e) {
+                        Logger.Error("Error loading settings.", e);
+                    }
+                }
+            }
+        }
+
+        private void SaveSettings() {
+            using (var fs = File.CreateText(settingsFile)) {
+                var serializer = new JsonSerializer();
+                var settings = new {
+                    Presets = _presets,
+                    Current = CurrentPreset,
+                    AppSettings = new AppSettings()
+                };
+                serializer.Serialize(fs, settings);
+            }
+        }
+
+        private void LoadFromCurrentPreset() {
+            ClientIdTextBox.Text = CurrentPreset.settings.ClientId;
+            AccessTokenTextBox.Text = CurrentPreset.settings.AccessToken;
+            DiscordTokenTextBox.Text = CurrentPreset.settings.DiscordToken;
+            ClipsChannelTextBox.Text = CurrentPreset.settings.ClipsChannel.ToString();
+            SummariesChannelTextBox.Text = CurrentPreset.settings.SummariesChannel.ToString();
+            GreenThresholdTextBox.Text = CurrentPreset.settings.GreenThreshold.ToString();
+            ChannelsListBox.Items.Clear();
+            CurrentPreset.settings.Channels.ForEach(x => ChannelsListBox.Items.Add(x));
+            ZoneTextBox.Text = CurrentPreset.settings.Zone;
+            ManualClipKeywordTextBox.Text = CurrentPreset.settings.ClipKeyword;
+            newPresetName.Text = CurrentPreset.Name;
+            plotLinesListBox.DataSource = CurrentPreset.settings.PlotLines;
+        }
+
+        #endregion
     }
 }
