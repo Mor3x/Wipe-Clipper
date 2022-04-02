@@ -139,9 +139,9 @@ namespace WipeClipperPlugin {
             this.plotLinesLabel.BackColor = System.Drawing.Color.Transparent;
             this.plotLinesLabel.Location = new System.Drawing.Point(335, 117);
             this.plotLinesLabel.Name = "plotLinesLabel";
-            this.plotLinesLabel.Size = new System.Drawing.Size(53, 13);
+            this.plotLinesLabel.Size = new System.Drawing.Size(59, 13);
             this.plotLinesLabel.TabIndex = 21;
-            this.plotLinesLabel.Text = "Plot Lines";
+            this.plotLinesLabel.Text = "Mechanics";
             // 
             // removePlotLineButton
             // 
