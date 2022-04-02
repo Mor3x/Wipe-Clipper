@@ -40,8 +40,13 @@ namespace WipeClipperUtils {
         public static async Task<string> GetUserIdByName(string username) {
             try {
                 Logger.Debug($"Fetching userID for {username}.");
-                var users = await _api.V5.Users.GetUserByNameAsync(username);
-                return users.Matches[0].Id; // there can only be one that matches
+                var users = await _api.Helix.Users.GetUsersAsync(logins: new List<string> { username });
+                if (users.Users.Length > 0) {
+                    return users.Users[0].Id;
+                }
+                
+                Logger.Debug("Error while fetching userID.");
+                return null;
             } catch (Exception e) {
                 Logger.Error("Error while fetching userID.", e);
                 return null;
