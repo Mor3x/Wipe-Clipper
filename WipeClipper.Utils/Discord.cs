@@ -55,7 +55,8 @@ namespace WipeClipperUtils {
 
                 var embed = new DiscordEmbedBuilder();
                 embed.WithAuthor(title);
-                embed.WithDescription(message.Replace("_", "\\_"));
+                var sanitized = Formatter.Sanitize(message);
+                embed.WithDescription(sanitized);
                 embed.WithTimestamp(DateTime.Today + time);
 
                 if (!isGreen.HasValue) {
