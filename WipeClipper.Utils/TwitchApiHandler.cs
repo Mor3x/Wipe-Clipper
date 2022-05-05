@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TwitchLib.Api;
+using DSharpPlus;
 
 namespace WipeClipperUtils {
     public class TwitchApiHandler {
@@ -24,7 +25,7 @@ namespace WipeClipperUtils {
                     try {
                         Logger.Debug($"Creating a clip for #{channelPair.Key}.");
                         var clip = await _api.Helix.Clips.CreateClipAsync(channelPair.Value);
-                        clips.Add(channelPair.Value, clip.CreatedClips[0].EditUrl.Replace("/edit", ""));
+                        clips.Add(channelPair.Value, $"https://clips.twitch.tv/{clip.CreatedClips[0].Id}");
                     } catch (Exception e) {
                         Logger.Error($"Unable to make clip for #{channelPair.Key}.", e);
                     }
