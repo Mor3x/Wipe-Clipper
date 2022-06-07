@@ -30,7 +30,7 @@ namespace WipeClipperPlugin {
                 return;
             }
 
-            await Task.Factory.StartNew(() => TwitchApiHandler.Setup(_preset));
+            TwitchApiHandler.Setup(_preset);
 
             foreach (var streamName in _preset.settings.Channels) {
                 var id = await TwitchApiHandler.GetUserIdByName(streamName);
@@ -39,7 +39,7 @@ namespace WipeClipperPlugin {
                 }
             }
 
-            await Task.Factory.StartNew(() => Discord.SetupBot(_preset.settings.ClipsChannel, _preset.settings.SummariesChannel, _preset));
+            await Discord.SetupBot(_preset.settings.ClipsChannel, _preset.settings.SummariesChannel, _preset);
 
             ActGlobals.oFormActMain.OnLogLineRead += OnLogLineRead;
             MainControl.OnPostSummary += HandlePostSummary;
@@ -61,7 +61,7 @@ namespace WipeClipperPlugin {
                 }
 
                 if (Regex.IsManualClip(logInfo.logLine)) {
-                    HandleManualClip();
+                    HandleManualClip().GetAwaiter().GetResult();
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace WipeClipperPlugin {
             }
         }
 
-        public static async void HandleManualClip() {
+        public static async Task HandleManualClip() {
             Logger.Debug("Creating clip manually.");
 
             var clips = await TwitchApiHandler.MakeClip(Settings.UserIDs);

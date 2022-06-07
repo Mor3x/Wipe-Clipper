@@ -2,7 +2,8 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Linq;
+using System.Linq;s
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace WipeClipperPlugin {
 
             if (AutoStartCheckBox.Checked) {
                 Logger.Debug("Starting on boot.");
-                MainLogic.Setup(CurrentPreset).ConfigureAwait(false);
+                Task.Factory.StartNew(async () => await MainLogic.Setup(CurrentPreset), TaskCreationOptions.LongRunning);
             }
         }
 
