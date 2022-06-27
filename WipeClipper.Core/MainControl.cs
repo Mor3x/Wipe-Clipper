@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Linq;s
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
