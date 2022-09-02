@@ -2,8 +2,9 @@
 
 namespace WipeClipperPlugin {
     class Regex {
-        private static readonly System.Text.RegularExpressions.Regex _wipe = new System.Text.RegularExpressions.Regex(@"(33\\|.*?\\|([0-9,a-f,A-F]{8})\\|4000000F)", RegexOptions.Compiled);
-        private static readonly System.Text.RegularExpressions.Regex _pull = new System.Text.RegularExpressions.Regex(@"(0039\\|\\|Engage)|(0039\\|\\|Start)|(0039\\|\\|À l'attaque)|(0039\\|\\|戦闘開始)", RegexOptions.Compiled);
+        // Text logs show |, but within ACT those are : so that's why we match those instead
+        private static readonly System.Text.RegularExpressions.Regex _wipe = new System.Text.RegularExpressions.Regex(@"(33:.*?:([0-9,a-f,A-F]{8}):4000000F)", RegexOptions.Compiled);
+        private static readonly System.Text.RegularExpressions.Regex _pull = new System.Text.RegularExpressions.Regex(@"(0039::Engage)|(0039::Start)|(0039::À l'attaque)|(0039::戦闘開始)");
         private static System.Text.RegularExpressions.Regex _zone = new System.Text.RegularExpressions.Regex(@"");
         private static System.Text.RegularExpressions.Regex _manualClip = new System.Text.RegularExpressions.Regex(@"!clip", RegexOptions.Compiled);
 
